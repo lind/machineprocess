@@ -52,8 +52,8 @@ public class Transition {
 			return transition;
 		}
 
-		public TransitionBuilder guardedBy(Guard by) {
-			transition.guard = by;
+		public TransitionBuilder guardedBy(Guard guard) {
+			transition.guard = guard;
 			return this;
 		}
 
