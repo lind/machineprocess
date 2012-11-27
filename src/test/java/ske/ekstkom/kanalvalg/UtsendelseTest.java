@@ -23,6 +23,7 @@ public class UtsendelseTest {
 	public static final String SEND_TIL_RENDERING = "send_til_rendering";
 	public static final String FEIL_I_DAL = "feil_i_dal";
 
+	// Given
 	@Before
 	public void initPrintStateMachine() {
 		logAction = new LogAction("Logging Action");
@@ -68,26 +69,27 @@ public class UtsendelseTest {
 	@Test
 	public void skal_gjennom_alle_tilstand() {
 
+		// When
 		printStateMachine.execute(Signal.create(SEND_TIL_RENDERING));
 		printStateMachine.execute(Signal.create(SEND_TIL_PRINT));
 		printStateMachine.execute(Signal.create(UTSENDING_UTFOERT));
 		printStateMachine.execute(Signal.create(RETUR_MOTTATT));
 
-		// validate active state
+		// Then
 		Assert.assertEquals("Feilet", printStateMachine.getActiveState().getName());
 
-		// validate actions occurred
 		logAction.assertNumberOfExecute(4);
-
-		// validate signals with no matching transitions
 		Assert.assertEquals(0, printStateMachine.numberOfSignalsNotMatchedTransitions());
 	}
 
 	@Test
 	public void skal_feile_i_rendering() {
+
+		// When
 		printStateMachine.execute(Signal.create(SEND_TIL_RENDERING));
 		printStateMachine.execute(Signal.create(FEIL_I_RENDERING));
 
+		// Then
 		Assert.assertEquals("Feilet", printStateMachine.getActiveState().getName());
 
 		logAction.assertNumberOfExecute(2);
@@ -97,12 +99,15 @@ public class UtsendelseTest {
 
 	@Test
 	public void skal_feile_i_rendering_og_ignorere_irrelevanet_signaler() {
+
+		// When
 		printStateMachine.execute(Signal.create(SEND_TIL_RENDERING));
 		printStateMachine.execute(Signal.create(FEIL_I_RENDERING));
 		printStateMachine.execute(Signal.create(FEIL_I_RENDERING));
 		printStateMachine.execute(Signal.create(FEIL_I_RENDERING));
 		printStateMachine.execute(Signal.create(FEIL_I_RENDERING));
 
+		// Then
 		Assert.assertEquals("Feilet", printStateMachine.getActiveState().getName());
 
 		// Ikke så relevante assert...
