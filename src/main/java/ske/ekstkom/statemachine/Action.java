@@ -2,10 +2,14 @@ package ske.ekstkom.statemachine;
 
 public abstract class Action {
 
-	private final String name;
+	private String name;
 
 	// TODO: add support for chaining actions.
 	// private Action nextAction;
+
+	public Action() {
+
+	}
 
 	public Action(String name) {
 		this.name = name;

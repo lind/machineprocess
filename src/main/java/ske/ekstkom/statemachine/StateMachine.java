@@ -10,8 +10,8 @@ import java.util.List;
 public class StateMachine {
 
 	// Record signals received for validation purpose.
-	private final List<Signal> signalsReceived = new ArrayList<Signal>();
-	private final List<Signal> signalsNotMatchedTransitions = new ArrayList<Signal>();
+	private List<Signal> signalsReceived;
+	private List<Signal> signalsNotMatchedTransitions;
 
 	private State activeState;
 	protected String name;
@@ -21,6 +21,9 @@ public class StateMachine {
 	}
 
 	public void execute(Signal signal) {
+		if (null == signalsReceived) {
+			signalsReceived = new ArrayList<Signal>();
+		}
 		signalsReceived.add(signal);
 
 		State nextState = activeState.execute(signal);
@@ -28,6 +31,9 @@ public class StateMachine {
 		if (null != nextState) {
 			activeState = nextState;
 		} else { // no state transition
+			if (null == signalsNotMatchedTransitions) {
+				signalsNotMatchedTransitions = new ArrayList<Signal>();
+			}
 			signalsNotMatchedTransitions.add(signal);
 		}
 	}

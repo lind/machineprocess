@@ -3,6 +3,9 @@ package ske.ekstkom.statemachine;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class StateMachineTest {
 
 	@Test
@@ -27,19 +30,27 @@ public class StateMachineTest {
 
 		StateMachine machine = StateMachine.named("TestMachine").initState(stateOne).build();
 
-		machine.execute(Signal.create("Sig1"));
-		machine.execute(Signal.create("Sig2"));
-		machine.execute(Signal.create("Sig3"));
-		machine.execute(Signal.create("Sig4"));
+		Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Action.class, new ActionAdapter())
+				.registerTypeAdapter(Guard.class, new GuardAdapter()).create();
+
+		String machineAsJSON = gson.toJson(machine);
+		System.out.println(machineAsJSON);
+
+		StateMachine machine2 = gson.fromJson(machineAsJSON, StateMachine.class);
+
+		machine2.execute(Signal.create("Sig1"));
+		machine2.execute(Signal.create("Sig2"));
+		machine2.execute(Signal.create("Sig3"));
+		machine2.execute(Signal.create("Sig4"));
 
 		// validate active state
-		Assert.assertEquals("FinalState", machine.getActiveState().getName());
+		Assert.assertEquals("FinalState", machine2.getActiveState().getName());
 
 		// validate actions occurred
 		logAction.assertNumberOfExecute(2);
 
 		// validate signals with no matching transitions
-		Assert.assertEquals(2, machine.numberOfSignalsNotMatchedTransitions());
+		Assert.assertEquals(2, machine2.numberOfSignalsNotMatchedTransitions());
 
 		// (if there are signals not matching any guard/transition log warn)
 	}
