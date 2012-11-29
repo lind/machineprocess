@@ -13,6 +13,8 @@ public class StateMachine {
 	private List<Signal> signalsReceived;
 	private List<Signal> signalsNotMatchedTransitions;
 
+	private final List<State> states = new ArrayList<State>();
+
 	private State activeState;
 	protected String name;
 
@@ -21,6 +23,8 @@ public class StateMachine {
 	}
 
 	public void execute(Signal signal) {
+		System.out.println("StateMachine.execute-activeState: " + activeState.getName() + " signal: "
+				+ signal.getName());
 		if (null == signalsReceived) {
 			signalsReceived = new ArrayList<Signal>();
 		}
@@ -42,12 +46,34 @@ public class StateMachine {
 		return activeState;
 	}
 
+	public void addState(State state) {
+		states.add(state);
+	}
+
+	public void setActiveState(String stateName) {
+		for (State state : states) {
+			if (state.getName().equals(stateName)) {
+				activeState = state;
+				break;
+			}
+		}
+	}
+
 	public List<Signal> getSignalsNotMatchedTransitions() {
 		return signalsNotMatchedTransitions;
 	}
 
 	public int numberOfSignalsNotMatchedTransitions() {
-		return signalsNotMatchedTransitions.size();
+		return null == signalsNotMatchedTransitions ? 0 : signalsNotMatchedTransitions.size();
+	}
+
+	public void clear() {
+		if (null != signalsReceived) {
+			signalsReceived.clear();
+		}
+		if (null != signalsNotMatchedTransitions) {
+			signalsNotMatchedTransitions.clear();
+		}
 	}
 
 	// -- Builder

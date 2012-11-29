@@ -7,7 +7,7 @@ import junit.framework.AssertionFailedError;
  */
 public class LogAction extends Action {
 
-	private int numberOfExecute;
+	private int numberOfExecute = 0;
 
 	public LogAction(String name) {
 		super(name);
@@ -16,7 +16,7 @@ public class LogAction extends Action {
 	@Override
 	protected void doAction(Signal signal) {
 		numberOfExecute++;
-		System.out.println("Action: " + getNname() + " executed");
+		System.out.println("Action: " + getNname() + " executed. numberOfExecute: " + numberOfExecute);
 	}
 
 	/**
