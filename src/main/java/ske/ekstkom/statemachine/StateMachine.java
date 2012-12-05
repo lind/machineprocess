@@ -33,8 +33,10 @@ public class StateMachine {
 		State nextState = activeState.execute(signal);
 
 		if (null != nextState) {
+			System.out.println("StateMachine.execute - new active state: " + nextState.getName());
 			activeState = nextState;
-		} else { // no state transition
+		} else { // no state transition - there might have been a state transition in a composite state...
+			System.out.println("StateMachine.execute - no transitions for signal: " + signal.getName());
 			if (null == signalsNotMatchedTransitions) {
 				signalsNotMatchedTransitions = new ArrayList<Signal>();
 			}
@@ -95,7 +97,7 @@ public class StateMachine {
 			return stateMachine;
 		}
 
-		public StateMachineBuilder initState(State state) {
+		public StateMachineBuilder initState(SimpleState state) {
 			stateMachine.activeState = state;
 			return this;
 		}

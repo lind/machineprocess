@@ -1,7 +1,5 @@
 package ske.ekstkom.statemachine;
 
-import ske.ekstkom.statemachine.State.StateBuilder;
-
 public class Transition {
 
 	protected final String name;
@@ -9,7 +7,7 @@ public class Transition {
 	protected State targetState;
 	protected Guard guard; // Guard not required (Automatic transition on any signal)
 
-	public Transition(String name, Action action, Guard guard, State targetState) {
+	public Transition(String name, Action action, Guard guard, SimpleState targetState) {
 		this.name = name;
 		this.action = action;
 		this.targetState = targetState;
@@ -32,17 +30,17 @@ public class Transition {
 	}
 
 	// -- Builder
-	public static TransitionBuilder named(String name, StateBuilder stateBuilder) {
-		return new TransitionBuilder(name, stateBuilder);
+	public static <T> TransitionBuilder<T> named(String name, T parentBuilder) {
+		return new TransitionBuilder<T>(name, parentBuilder);
 	}
 
-	public static class TransitionBuilder {
+	public static class TransitionBuilder<T> {
 		Transition transition;
-		StateBuilder parentBuilder;
+		T parentBuilder;
 
-		public TransitionBuilder(String name, StateBuilder stateBuilder) {
+		public TransitionBuilder(String name, T parentBuilder) {
 			this.transition = new Transition(name);
-			this.parentBuilder = stateBuilder;
+			this.parentBuilder = parentBuilder;
 		}
 
 		public Transition build() {
@@ -52,17 +50,17 @@ public class Transition {
 			return transition;
 		}
 
-		public TransitionBuilder guardedBy(Guard guard) {
+		public TransitionBuilder<T> guardedBy(Guard guard) {
 			transition.guard = guard;
 			return this;
 		}
 
-		public TransitionBuilder withAction(Action action) {
+		public TransitionBuilder<T> withAction(Action action) {
 			transition.action = action;
 			return this;
 		}
 
-		public StateBuilder to(State state) {
+		public T to(State state) {
 			transition.targetState = state;
 			return parentBuilder;
 		}

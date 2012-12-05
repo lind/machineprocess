@@ -10,7 +10,9 @@ import ske.ekstkom.statemachine.Guard;
 import ske.ekstkom.statemachine.GuardAdapter;
 import ske.ekstkom.statemachine.LogAction;
 import ske.ekstkom.statemachine.Signal;
+import ske.ekstkom.statemachine.SimpleState;
 import ske.ekstkom.statemachine.State;
+import ske.ekstkom.statemachine.StateAdapter;
 import ske.ekstkom.statemachine.StateMachine;
 
 import com.google.gson.Gson;
@@ -39,9 +41,11 @@ public class UtsendelseTest {
 	private static StateMachine utsendingStateMachine;
 	private static String machineAsJSON;
 
-	private final Gson gson = new GsonBuilder().setPrettyPrinting()
-			.registerTypeAdapter(Action.class, new ActionAdapter())
-			.registerTypeAdapter(Guard.class, new GuardAdapter()).create();
+	private static final Gson gson = new GsonBuilder().setPrettyPrinting()
+			.registerTypeAdapter(Action.class, new ActionAdapter()) //
+			.registerTypeAdapter(Guard.class, new GuardAdapter()) //
+			.registerTypeAdapter(State.class, new StateAdapter()) //
+			.create();
 
 	// Given
 	@BeforeClass
@@ -52,15 +56,15 @@ public class UtsendelseTest {
 		AddToQueueAction addToAltInnQueue = AddToQueueAction.named("AltInnKø").queueNameJNDI("JNDI/AltInn..")
 				.queueFactoryJNDI("JNDI/factory").build();
 
-		State feilet = State.named("Feilet").build();
+		SimpleState feilet = SimpleState.named("Feilet").build();
 
 		// Sluttilstand hvis ikke brev mottas i retur.
-		State sendtUt = State.named("SendtUt")
+		SimpleState sendtUt = SimpleState.named("SendtUt")
 				//
 				.transition("til feilet").guardedBy(UtsendelseGuard.by(RETUR_MOTTATT)).withAction(logAction).to(feilet)
 				.build();
 
-		State sendtTilPrint = State
+		SimpleState sendtTilPrint = SimpleState
 				.named(SENDT_TIL_PRINT_STATE)
 				//
 				.transition("til_sendt_ut").guardedBy(UtsendelseGuard.by(UTSENDING_UTFOERT)).withAction(logAction)
@@ -69,7 +73,7 @@ public class UtsendelseTest {
 				.transition("til_feil").guardedBy(UtsendelseGuard.by(FEIL_I_UTSKRIFT)).withAction(logAction).to(feilet)
 				.build();
 
-		State tilRendering = State
+		SimpleState tilRendering = SimpleState
 				.named(TIL_RENDERING_STATE)
 				//
 				.transition("Til_sendt_til_print").guardedBy(UtsendelseGuard.by(SEND_TIL_PRINT)).withAction(logAction)
@@ -78,7 +82,7 @@ public class UtsendelseTest {
 				.transition("til_feil").guardedBy(UtsendelseGuard.by(FEIL_I_RENDERING)).withAction(logAction)
 				.to(feilet).build();
 
-		State tilAltInn = State
+		SimpleState tilAltInn = SimpleState
 				.named(TIL_ALTINN_STATE)
 				//
 				.transition("til_sendt_ut").guardedBy(UtsendelseGuard.by(MOTTATT_I_ALTINN)).withAction(logAction)
@@ -88,12 +92,13 @@ public class UtsendelseTest {
 				.withAction(addToPrintQueue).to(tilRendering).build();
 
 		// Starttilstand for utsending
-		State utsendelseBestilt = State.named(UTSENDELSE_BESTILT)
+		SimpleState utsendelseBestilt = SimpleState.named(UTSENDELSE_BESTILT)
 				//
 				.transition("til_altinn").guardedBy(UtsendelseGuard.by(START_UTSENDING)).withAction(addToAltInnQueue)
 				.to(tilAltInn).build();
 
 		utsendingStateMachine = StateMachine.named("UtsendingStateMachine").initState(utsendelseBestilt).build();
+
 		// Legg til state slik at aktiv state kan settes etter deserialize
 		utsendingStateMachine.addState(utsendelseBestilt);
 		utsendingStateMachine.addState(tilAltInn);
@@ -101,9 +106,6 @@ public class UtsendelseTest {
 		utsendingStateMachine.addState(sendtTilPrint);
 		utsendingStateMachine.addState(sendtUt);
 		utsendingStateMachine.addState(feilet);
-
-		Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Action.class, new ActionAdapter())
-				.registerTypeAdapter(Guard.class, new GuardAdapter()).create();
 
 		machineAsJSON = gson.toJson(utsendingStateMachine);
 		System.out.println(machineAsJSON);
