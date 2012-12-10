@@ -25,10 +25,10 @@ public class CompositeState implements State {
 		super(); // name);
 	}
 
-	public State execute(Signal signal) {
+	public State execute(Signal signal, boolean testScope) {
 		System.out.println("CompositeState.execute - start");
 
-		State nextInternalState = activeState.execute(signal);
+		State nextInternalState = activeState.execute(signal, testScope);
 
 		if (null != nextInternalState) {
 			activeState = nextInternalState;
@@ -46,7 +46,7 @@ public class CompositeState implements State {
 				if (transition.checkGuard(signal)) {
 
 					// TODO: any post processing? Check that nextstate is not null? Needed?
-					return transition.execute(signal);
+					return transition.execute(signal, testScope);
 				}
 			}
 		}

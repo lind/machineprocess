@@ -1,6 +1,8 @@
-package ske.ekstkom.statemachine;
+package ske.ekstkom.statemachine.gson;
 
 import java.lang.reflect.Type;
+
+import ske.ekstkom.statemachine.Action;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

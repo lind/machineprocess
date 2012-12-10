@@ -14,7 +14,11 @@ public class LogAction extends Action {
 	}
 
 	@Override
-	protected void doAction(Signal signal) {
+	protected void doAction(Signal signal, boolean testScope) {
+		if (testScope) {
+			System.out.println("StateMachine in testscope. Don´t use @Inject references.");
+			return;
+		}
 		numberOfExecute++;
 		System.out.println("Action: " + getNname() + " executed. numberOfExecute: " + numberOfExecute);
 	}

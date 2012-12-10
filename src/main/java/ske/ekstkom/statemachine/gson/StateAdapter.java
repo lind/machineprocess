@@ -1,6 +1,8 @@
-package ske.ekstkom.statemachine;
+package ske.ekstkom.statemachine.gson;
 
 import java.lang.reflect.Type;
+
+import ske.ekstkom.statemachine.State;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -11,12 +13,12 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public class GuardAdapter implements JsonSerializer<Guard>, JsonDeserializer<Guard> {
+public class StateAdapter implements JsonSerializer<State>, JsonDeserializer<State> {
 
 	private static final String CLASSNAME = "CLASSNAME";
 	private static final String INSTANCE = "INSTANCE";
 
-	public Guard deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+	public State deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
 		JsonObject jsonObject = json.getAsJsonObject();
 		JsonPrimitive prim = (JsonPrimitive) jsonObject.get(CLASSNAME);
@@ -32,7 +34,7 @@ public class GuardAdapter implements JsonSerializer<Guard>, JsonDeserializer<Gua
 		return context.deserialize(jsonObject.get(INSTANCE), klass);
 	}
 
-	public JsonElement serialize(Guard src, Type typeOfSrc, JsonSerializationContext context) {
+	public JsonElement serialize(State src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject retValue = new JsonObject();
 		String className = src.getClass().getCanonicalName();
 		retValue.addProperty(CLASSNAME, className);

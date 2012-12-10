@@ -5,15 +5,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ske.ekstkom.statemachine.Action;
-import ske.ekstkom.statemachine.ActionAdapter;
 import ske.ekstkom.statemachine.Guard;
-import ske.ekstkom.statemachine.GuardAdapter;
 import ske.ekstkom.statemachine.LogAction;
 import ske.ekstkom.statemachine.Signal;
 import ske.ekstkom.statemachine.SimpleState;
 import ske.ekstkom.statemachine.State;
-import ske.ekstkom.statemachine.StateAdapter;
 import ske.ekstkom.statemachine.StateMachine;
+import ske.ekstkom.statemachine.gson.ActionAdapter;
+import ske.ekstkom.statemachine.gson.GuardAdapter;
+import ske.ekstkom.statemachine.gson.StateAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -3,6 +3,10 @@ package ske.ekstkom.statemachine;
 import org.junit.Assert;
 import org.junit.Test;
 
+import ske.ekstkom.statemachine.gson.ActionAdapter;
+import ske.ekstkom.statemachine.gson.GuardAdapter;
+import ske.ekstkom.statemachine.gson.StateAdapter;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -31,10 +35,9 @@ public class StateMachineTest {
 				.transition("toFinal").to(finalState).build();
 
 		// State with two transitions
-		SimpleState stateOne = SimpleState.named("StateOne")
-
-		.transition("toTwo").guardedBy(NameGuard.by("Sig2")).withAction(logAction).to(stateTwo).transition("toThree")
-				.guardedBy(NameGuard.by("Sig3")).withAction(logAction).to(stateThree).build();
+		SimpleState stateOne = SimpleState.named("StateOne") //
+				.transition("toTwo").guardedBy(NameGuard.by("Sig2")).withAction(logAction).to(stateTwo) //
+				.transition("toThree").guardedBy(NameGuard.by("Sig3")).withAction(logAction).to(stateThree).build();
 
 		StateMachine machine = StateMachine.named("TestMachine").initState(stateOne).build();
 		machine.addState(stateOne);
@@ -42,7 +45,9 @@ public class StateMachineTest {
 		machine.addState(stateThree);
 		machine.addState(finalState);
 
-		Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Action.class, new ActionAdapter())
+		Gson gson = new GsonBuilder().setPrettyPrinting()
+				//
+				.registerTypeAdapter(Action.class, new ActionAdapter())
 				.registerTypeAdapter(Guard.class, new GuardAdapter()) //
 				.registerTypeAdapter(State.class, new StateAdapter()) //
 				.create();
@@ -52,6 +57,7 @@ public class StateMachineTest {
 
 		StateMachine machine2 = gson.fromJson(machineAsJSON, StateMachine.class);
 
+		machine2.testScope(true);
 		machine2.execute(Signal.create("Sig1"));
 		machine2.execute(Signal.create("Sig2")); // toTwo
 		machine2.execute(Signal.create("Sig3"));

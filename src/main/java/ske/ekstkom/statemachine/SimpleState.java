@@ -23,7 +23,7 @@ public class SimpleState implements State {
 	 * 
 	 * @see ske.ekstkom.statemachine.Execution#execute(ske.ekstkom.statemachine.Signal)
 	 */
-	public State execute(Signal signal) {
+	public State execute(Signal signal, boolean testScope) {
 
 		// Validate transitions not empty.
 		// TODO illegal state of State. Throw ex or log warn.
@@ -35,7 +35,7 @@ public class SimpleState implements State {
 			if (transition.checkGuard(signal)) {
 
 				// TODO: any post prosessing? Check that nextstate is not null? Needed?
-				return transition.execute(signal);
+				return transition.execute(signal, testScope);
 			}
 		}
 		return null; // No matching transitions for this signal. TODO: Log info

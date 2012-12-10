@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Simple StateMachine without sub-state machine, composite state, deferred signals, queues and no runtime engine
- * environment.
+ * Simple StateMachine without sub-state machine, deferred signals, queues and no runtime engine environment.
  */
 public class StateMachine {
 
@@ -17,6 +16,7 @@ public class StateMachine {
 
 	private State activeState;
 	protected String name;
+	private boolean testScope;
 
 	private StateMachine(String name) {
 		this.name = name;
@@ -30,7 +30,7 @@ public class StateMachine {
 		}
 		signalsReceived.add(signal);
 
-		State nextState = activeState.execute(signal);
+		State nextState = activeState.execute(signal, testScope);
 
 		if (null != nextState) {
 			System.out.println("StateMachine.execute - new active state: " + nextState.getName());
@@ -76,6 +76,10 @@ public class StateMachine {
 		if (null != signalsNotMatchedTransitions) {
 			signalsNotMatchedTransitions.clear();
 		}
+	}
+
+	public void testScope(boolean testScope) {
+		this.testScope = testScope;
 	}
 
 	// -- Builder

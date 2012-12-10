@@ -15,11 +15,11 @@ public abstract class Action {
 		this.name = name;
 	}
 
-	public void execute(final Signal signal) {
+	public void execute(final Signal signal, boolean testScope) {
 		// Todo: Any preaction needed?
 		// Signal preActionSignal = doPreAction(stateMashine, signal);
 
-		doAction(signal);
+		doAction(signal, testScope);
 
 		// if (null != nextAction) {
 		// nextAction.execute(stateMashine, signal);
@@ -27,7 +27,7 @@ public abstract class Action {
 		// doPostAction(stateMashine, signal);
 	}
 
-	protected abstract void doAction(final Signal signal);
+	protected abstract void doAction(final Signal signal, boolean testScope);
 
 	public String getNname() {
 		return name;

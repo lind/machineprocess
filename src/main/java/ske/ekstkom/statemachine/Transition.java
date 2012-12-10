@@ -22,9 +22,9 @@ public class Transition {
 		return guard.check(signal);
 	}
 
-	public State execute(Signal signal) {
+	public State execute(Signal signal, boolean testScope) {
 		if (null != action) {
-			action.execute(signal);
+			action.execute(signal, testScope);
 		}
 		return targetState;
 	}
