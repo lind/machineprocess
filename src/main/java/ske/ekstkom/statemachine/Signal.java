@@ -2,18 +2,18 @@ package ske.ekstkom.statemachine;
 
 public class Signal {
 
-	private final String name;
+	private final String event;
 
-	public Signal(String name) {
-		this.name = name;
+	public Signal(String event) {
+		this.event = event;
 	}
 
 	public String getName() {
-		return name;
+		return event;
 	}
 
-	public static Signal create(String name) {
-		return new Signal(name);
+	public static Signal create(String event) {
+		return new Signal(event);
 	}
 
 }

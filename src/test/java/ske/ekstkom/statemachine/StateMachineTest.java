@@ -12,6 +12,8 @@ import com.google.gson.GsonBuilder;
 
 public class StateMachineTest {
 
+	private static final String INTERNAL_STATE2 = "InternalState2";
+	private static final String COMPOSITE_STATE_TWO = "CompositeStateTwo";
 	private static final String SIG_INTERNAL = "SigInternal";
 
 	@Test
@@ -20,15 +22,14 @@ public class StateMachineTest {
 
 		SimpleState finalState = SimpleState.named("FinalState").build();
 
-		SimpleState internal2 = SimpleState.named("Internal2").build();
-		SimpleState internal1 = SimpleState.named("Internal1").transition("toInternal2")
+		SimpleState internal2 = SimpleState.named(INTERNAL_STATE2).build();
+		SimpleState internal1 = SimpleState.named("InternalState1").transition("toInternal2")
 				.guardedBy(NameGuard.by(SIG_INTERNAL)).to(internal2).build();
 
 		// State with transition with guard and action.
-		CompositeState stateTwo = CompositeState.cnamed("StateTwo").internalInitState(internal1) //
+		CompositeState stateTwo = CompositeState.named(COMPOSITE_STATE_TWO) //
+				.initTransition("toInternal1").withAction(logAction).to(internal1) //
 				.transition("toFinal").guardedBy(NameGuard.by("Sig4")).withAction(logAction).to(finalState).build();
-
-		// State stateTwo = State.named("Internal2").build();
 
 		// State with transition without guard and no action.
 		SimpleState stateThree = SimpleState.named("StateThree") //
@@ -40,6 +41,8 @@ public class StateMachineTest {
 				.transition("toThree").guardedBy(NameGuard.by("Sig3")).withAction(logAction).to(stateThree).build();
 
 		StateMachine machine = StateMachine.named("TestMachine").initState(stateOne).build();
+		machine.addState(internal1);
+		machine.addState(internal2);
 		machine.addState(stateOne);
 		machine.addState(stateTwo);
 		machine.addState(stateThree);
@@ -53,13 +56,14 @@ public class StateMachineTest {
 				.create();
 
 		String machineAsJSON = gson.toJson(machine);
-		System.out.println(machineAsJSON);
+		// System.out.println(machineAsJSON);
 
 		StateMachine machine2 = gson.fromJson(machineAsJSON, StateMachine.class);
 
-		machine2.testScope(true);
+		// machine2.setActiveState(COMPOSITE_STATE_TWO, INTERNAL_STATE2);
+
 		machine2.execute(Signal.create("Sig1"));
-		machine2.execute(Signal.create("Sig2")); // toTwo
+		machine2.execute(Signal.create("Sig2")); // toTwo, internal1
 		machine2.execute(Signal.create("Sig3"));
 		machine2.execute(Signal.create(SIG_INTERNAL)); // toInternal2 - just internal state transition in the composite
 														// state stateTwo - not registered
@@ -71,6 +75,8 @@ public class StateMachineTest {
 		// validate actions occurred
 		// TODO: not same log action after GSON ser/dez...
 		// logAction.assertNumberOfExecute(2);
+
+		// TODO: validate signals matched and not matched
 
 		// validate signals with no matching transitions (does not count composite state internal transitions)
 		Assert.assertEquals(3, machine2.numberOfSignalsNotMatchedTransitions());

@@ -19,12 +19,12 @@ public class Transition {
 	}
 
 	public boolean checkGuard(Signal signal) {
-		return guard.check(signal);
+		return null == guard ? true : guard.check(signal);
 	}
 
-	public State execute(Signal signal, boolean testScope) {
+	public State execute(Signal signal, StateMachine stateMachine) {
 		if (null != action) {
-			action.execute(signal, testScope);
+			action.execute(signal, stateMachine);
 		}
 		return targetState;
 	}
@@ -41,6 +41,10 @@ public class Transition {
 		public TransitionBuilder(String name, T parentBuilder) {
 			this.transition = new Transition(name);
 			this.parentBuilder = parentBuilder;
+		}
+
+		public TransitionBuilder(String name) {
+			this.transition = new Transition(name);
 		}
 
 		public Transition build() {

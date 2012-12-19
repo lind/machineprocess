@@ -13,11 +13,7 @@ public class AddToQueueAction extends Action {
 	}
 
 	@Override
-	protected void doAction(Signal signal, boolean testScope) {
-		if (testScope) {
-			System.out.println("StateMachine in testscope. Don´t use @Inject references.");
-			return;
-		}
+	protected void doAction(Signal signal) {
 		System.out.println("TODO: get queue from JNDI and add message");
 	}
 

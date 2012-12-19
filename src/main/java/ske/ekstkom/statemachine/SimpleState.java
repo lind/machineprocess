@@ -23,7 +23,7 @@ public class SimpleState implements State {
 	 * 
 	 * @see ske.ekstkom.statemachine.Execution#execute(ske.ekstkom.statemachine.Signal)
 	 */
-	public State execute(Signal signal, boolean testScope) {
+	public State execute(Signal signal, StateMachine stateMachine) {
 
 		// Validate transitions not empty.
 		// TODO illegal state of State. Throw ex or log warn.
@@ -35,10 +35,22 @@ public class SimpleState implements State {
 			if (transition.checkGuard(signal)) {
 
 				// TODO: any post prosessing? Check that nextstate is not null? Needed?
-				return transition.execute(signal, testScope);
+				return transition.execute(signal, stateMachine);
 			}
 		}
 		return null; // No matching transitions for this signal. TODO: Log info
+	}
+
+	/**
+	 * hook for entry behavior
+	 */
+	public void entry(Signal signal, StateMachine stateMachine) {
+	}
+
+	/**
+	 * hook for exit behavior
+	 */
+	public void exit(Signal signal, StateMachine stateMachine) {
 	}
 
 	public String getName() {
@@ -50,19 +62,19 @@ public class SimpleState implements State {
 	}
 
 	// -- Builder
-	public static StateBuilder named(String name) {
-		return new StateBuilder(name);
+	public static SimpleStateBuilder named(String name) {
+		return new SimpleStateBuilder(name);
 	}
 
-	public static class StateBuilder {
+	public static class SimpleStateBuilder {
 		SimpleState state;
-		TransitionBuilder<StateBuilder> transitionBuilder;
+		TransitionBuilder<SimpleStateBuilder> transitionBuilder;
 
-		protected StateBuilder(SimpleState state) {
+		protected SimpleStateBuilder(SimpleState state) {
 			this.state = state;
 		}
 
-		public StateBuilder(String name) {
+		public SimpleStateBuilder(String name) {
 			this.state = new SimpleState(name);
 		}
 
@@ -73,7 +85,7 @@ public class SimpleState implements State {
 			return state;
 		}
 
-		public TransitionBuilder<StateBuilder> transition(String name) {
+		public TransitionBuilder<SimpleStateBuilder> transition(String name) {
 			if (null != transitionBuilder) {
 				state.transitions.add(transitionBuilder.build());
 			}
