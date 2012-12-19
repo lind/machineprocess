@@ -4,11 +4,10 @@ public abstract class Action {
 
 	private String name;
 
-	// TODO: add support for chaining actions.
-	// private Action nextAction;
+	// The next element in the chain of responsibility
+	private Action nextAction;
 
 	public Action() {
-
 	}
 
 	public Action(String name) {
@@ -17,7 +16,6 @@ public abstract class Action {
 
 	public void execute(final Signal signal, StateMachine stateMachine) {
 
-		// TODO: registrer actions som kjøres
 		stateMachine.addActionExecuted(this);
 
 		// Todo: Any preaction needed?
@@ -25,9 +23,9 @@ public abstract class Action {
 
 		doAction(signal);
 
-		// if (null != nextAction) {
-		// nextAction.execute(stateMashine, signal);
-		// }
+		if (null != nextAction) {
+			nextAction.execute(signal, stateMachine);
+		}
 		// doPostAction(stateMashine, signal);
 	}
 
@@ -36,6 +34,10 @@ public abstract class Action {
 	// hook...
 	public String getDestination() {
 		return null;
+	}
+
+	public void setNext(Action action) {
+		this.nextAction = action;
 	}
 
 	public String getNname() {

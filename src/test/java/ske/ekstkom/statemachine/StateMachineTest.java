@@ -19,6 +19,8 @@ public class StateMachineTest {
 	@Test
 	public void test() {
 		LogAction logAction = new LogAction("Logging Action");
+		LogAction logAction2 = new LogAction("Logging Action 2");
+		logAction.setNext(logAction2);
 
 		SimpleState finalState = SimpleState.named("FinalState").build();
 

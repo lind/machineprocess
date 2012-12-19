@@ -35,5 +35,4 @@ public class LogAction extends Action {
 	public static LogAction named(String name) {
 		return new LogAction(name);
 	}
-
 }
