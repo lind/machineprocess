@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,18 +16,27 @@ import org.slf4j.LoggerFactory;
  * <p>
  * To state should not have the same name. If to states have the same name it is not deterministic which one is chosen when the active stave is loaded.
  */
-public class StateMachine {
+public class StateMachine implements CompositeElement {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    protected State activeState;
+    private State activeState;
     private List<State> states = new ArrayList<>();
 
     protected void addStates(List<State> states) {
         this.states.addAll(states);
     }
 
+    protected void activeState(State state) {
+        this.activeState = state;
+        this.activeState.entry();
+    }
+
     public String getActiveStateName() {
         return activeState.getName();
+    }
+
+    @Override public State getActiveState() {
+        return activeState;
     }
 
     public void validate() {
@@ -41,23 +51,24 @@ public class StateMachine {
 
         State state = activeState;
 
-        while (state.isCompositeState()) {
+        while (state instanceof CompositeElement) {
             activeStateConfiguration.add(state.getName());
-            state = state.getActiveState();
+            state = ((CompositeElement) state).getActiveState();
         }
         activeStateConfiguration.add(state.getName());
 
-        log.debug("Active state configuration {}", activeStateConfiguration);
+        log.debug("getActiveStateConfiguration - {}", activeStateConfiguration);
         return activeStateConfiguration;
     }
 
     public void activeStateConfiguration(List<String> activeStateConfiguration) {
-        log.debug("activeStateConfiguration - {} ", activeStateConfiguration);
+        log.debug("activeStateConfiguration - active states: {} ", activeStateConfiguration);
 
         ListIterator<String> configurationIterator = activeStateConfiguration.listIterator();
 
-        Optional<State> state = CompositeElement.configure(configurationIterator, states);
+        Optional<State> state = configure(configurationIterator, states);
         if (state.isPresent()) {
+            log.debug("activeStateConfiguration - active state: {}", state.get().getName());
             activeState = state.get();
         }
     }

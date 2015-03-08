@@ -94,7 +94,7 @@ public class PhoneStateMachine extends StateMachine {
                 .transition(CALL_DIAL).guardedBy(event -> event.getName().equals(CALL_DIALED))
                 .to(ringing).build());
         addStates(Arrays.asList(offHook, phoneDestroyed, onHold, connected, ringing));
-        activeState = offHook;
+        activeState(offHook);
         validate();
     }
 

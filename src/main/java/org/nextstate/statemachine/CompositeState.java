@@ -8,7 +8,13 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CompositeState extends AbstractState {
+/**
+ * Composite State containing inner states.
+ * <br>
+ * The default transition from the Composite state after the {@link org.nextstate.statemachine.FinalState} is reached
+ * is checked with a {@link org.nextstate.statemachine.FinalState#FINAL_EVENT} as a guard.
+ */
+public class CompositeState extends AbstractState implements CompositeElement {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private State activeState;
@@ -25,8 +31,9 @@ public class CompositeState extends AbstractState {
 
     @Override public void activeStateConfiguration(ListIterator<String> configurationIterator) {
 
-        Optional<State> state = CompositeElement.configure(configurationIterator, states);
+        Optional<State> state = configure(configurationIterator, states);
         if (state.isPresent()) {
+            log.debug("activeStateConfiguration - active state: {}", state.get().getName());
             activeState = state.get();
         }
     }
@@ -36,15 +43,11 @@ public class CompositeState extends AbstractState {
         activeState = initialTransition.getTargetState();
     }
 
-    @Override public boolean isCompositeState() {
-        return true;
-    }
-
     @Override public Optional<State> execute(Event event) {
         if (activeState == null) {
             throw new IllegalStateException("No internal active state in Composite State: " + name);
         }
-        log.debug("execute - {} - activeState: {} event: {}", name, activeState.getName(), event.getName());
+        log.debug("execute - {} - activeState: {} - event: {}", name, activeState.getName(), event.getName());
 
         Optional<State> state = activeState.execute(event);
 
@@ -59,32 +62,12 @@ public class CompositeState extends AbstractState {
             if (activeState.transitionToFinalState()) {
                 log.debug("execute - Transition from {} to final state", activeState.getName());
 
-                Optional<Transition> tran = transitions.stream().filter(
-                        transition -> transition.guard.test(new Event(FinalState.FINAL_EVENT))).findFirst();
-
-                if (!tran.isPresent()) {
-                    log.warn("execute - No Transition without guards exists in {} state!", name);
-                    // Final state and no transitions in Composite state without guards... Exception?
-                    return Optional.empty();
-                }
-                State targetState = tran.get().getTargetState();
-                log.debug("execute - Target state: {}", targetState.getName());
-                return Optional.ofNullable(targetState);
+                // Check final transition from the composite state...
+                return stateTransition(new Event(FinalState.FINAL_EVENT));
             }
         }
-
-        // Transitions from Composite State
-        Optional<Transition> matchedTransition = transitions.stream().filter(transition -> transition.guard.test(event)).findFirst();
-
-        log.debug("execute - {} event: {} ", name, event.getName(), (matchedTransition.isPresent() ?
-                " transition to state: " + matchedTransition.get().getTargetState().getName() :
-                " no transition match."));
-
-        if (!matchedTransition.isPresent()) {
-            log.debug("execute - No transition match event: {} in state: {}", event.getName(), name);
-            return Optional.empty();
-        }
-        return Optional.ofNullable(matchedTransition.get().getTargetState());
+        // Or check transition from composite state with the event.
+        return stateTransition(event);
     }
 
     // --------------------- Builder ---------------------

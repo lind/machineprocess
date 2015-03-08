@@ -1,6 +1,5 @@
 package org.nextstate.statemachine;
 
-import java.util.ListIterator;
 import java.util.Optional;
 
 public interface State {
@@ -21,9 +20,4 @@ public interface State {
      */
     void exit();
 
-    boolean isCompositeState();
-
-    State getActiveState();
-
-    void activeStateConfiguration(ListIterator<String> configurationIterator);
 }

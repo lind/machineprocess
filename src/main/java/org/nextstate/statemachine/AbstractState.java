@@ -2,10 +2,14 @@ package org.nextstate.statemachine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractState implements State {
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+
     protected String name;
     protected List<Transition> transitions = new ArrayList<>();
 
@@ -25,22 +29,38 @@ public abstract class AbstractState implements State {
         this.transitions.addAll(transitionList);
     }
 
-    @Override public void activeStateConfiguration(ListIterator<String> configurationIterator) {}
+    public Optional<State> stateTransition(Event event) {
+
+        Optional<Transition> transition = transitions.stream().filter(t -> t.guard.test(event))
+                .findFirst();
+
+        log.debug("execute - {} event: {} ", name, event.getName(), (transition.isPresent() ?
+                " transition to state: " + transition.get().getTargetState().getName() :
+                " no transition match."));
+
+        if (!transition.isPresent()) {
+            log.debug("execute - No transition match event: {} in state: {}", event.getName(), name);
+            return Optional.empty();
+        }
+        return Optional.ofNullable(transition.get().getTargetState());
+    }
 
     public boolean transitionToFinalState() {
-        Optional<Transition> tran = transitions.stream().filter(
-                transition -> transition.guard.test(new Event(FinalState.FINAL_EVENT))).findFirst();
+        Optional<Transition> transition = transitions.stream().filter(
+                t -> t.guard.test(new Event(FinalState.FINAL_EVENT))).findFirst();
 
-        if (tran.isPresent()) {
-            if (tran.get().getTargetState() instanceof FinalState) {
+        if (transition.isPresent()) {
+            if (transition.get().getTargetState() instanceof FinalState) {
                 return true;
             }
         }
         return false;
     }
 
-    @Override public void entry() {}
+    @Override public void entry() {
+    }
 
-    @Override public void exit() {}
+    @Override public void exit() {
+    }
 
 }

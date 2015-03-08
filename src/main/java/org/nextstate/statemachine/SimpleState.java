@@ -12,28 +12,8 @@ public class SimpleState extends AbstractState implements State {
         super(name);
     }
 
-    @Override public boolean isCompositeState() {
-        return false;
-    }
-
-    @Override public State getActiveState() {
-        return null;
-    }
-
     @Override public Optional<State> execute(Event event) {
-
-        Optional<Transition> matchedTransition = transitions.stream().filter(transition -> transition.guard.test(event))
-                .findFirst();
-
-        log.debug("execute - {} event: {} ", name, event.getName(), (matchedTransition.isPresent() ?
-                " transition to state: " + matchedTransition.get().getTargetState().getName() :
-                " no transition match."));
-
-        if (!matchedTransition.isPresent()) {
-            log.debug("No transition match event: {}", event.getName());
-            return Optional.empty();
-        }
-        return Optional.ofNullable(matchedTransition.get().getTargetState());
+        return stateTransition(event);
     }
 
     // --------------------- Builder ---------------------

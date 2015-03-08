@@ -146,7 +146,7 @@ public class ATMStateMachineTest {
                     .build());
 
             addStates(asList(off, selfTest, idle, servingCustomerCompositeState));
-            activeState = off;
+            activeState(off);
             validate();
         }
     }
