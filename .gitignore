@@ -8,5 +8,6 @@ target
 *.war
 *.ear
 
-.idea
+*.idea
 .iml
+
