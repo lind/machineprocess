@@ -65,7 +65,7 @@ public class StateMachineTest {
 
         stateMachine.execute(new ToInnerState2());
 
-        assertThat(stateMachine.getActiveStateConfiguration()).containsSequence(COMPOSITE_STATE_1, INNER_STATE_2);
+        assertThat(stateMachine.getActiveStateConfiguration()).containsSequence(A_SIMPLE_STATE_2);
     }
 
     @Test
