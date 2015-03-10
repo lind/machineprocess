@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +16,10 @@ import org.slf4j.LoggerFactory;
  * To state should not have the same name. If to states have the same name it is not deterministic which one is chosen when the active stave is loaded.
  */
 public class StateMachine implements CompositeElement {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private State activeState;
-    private List<State> states = new ArrayList<>();
+    private final List<State> states = new ArrayList<>();
 
     protected void addStates(List<State> states) {
         this.states.addAll(states);
@@ -43,7 +42,6 @@ public class StateMachine implements CompositeElement {
         if (activeState == null) {
             throw new IllegalStateException("No active state");
         }
-        // TODO: validate that all states are added.
     }
 
     public List<String> getActiveStateConfiguration() {

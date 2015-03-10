@@ -38,7 +38,7 @@ import java.util.Arrays;
  * TakeOffHold trigger @TakenOffHold: on_event @StopMuzak
  * HurlPhone trigger @PhoneHurledAgainstWall
  */
-public class PhoneStateMachine extends StateMachine {
+class PhoneStateMachine extends StateMachine {
     // State names
     public static final String OFF_HOOK = "OffHook";
     public static final String RINGING = "Ringing";
@@ -47,22 +47,22 @@ public class PhoneStateMachine extends StateMachine {
     public static final String PHONE_DESTROYED = "PhoneDestroyed";
 
     // Event names
-    public static final String CALL_DIALED = "CallDialed";
-    public static final String HUNG_UP = "HungUp";
-    public static final String CALL_CONNECTED = "CallConnected";
-    public static final String MESSAGE_LEFT = "MessageLeft";
-    public static final String PLACED_ON_HOLD = "PlacedOnHold";
-    public static final String TOOK_OFF_HOLD = "TookOffHold";
-    public static final String PHONE_HURLED_AGAINST_WALL = "PhoneHurledAgainstWall";
+    private static final String CALL_DIALED = "CallDialed";
+    private static final String HUNG_UP = "HungUp";
+    private static final String CALL_CONNECTED = "CallConnected";
+    private static final String MESSAGE_LEFT = "MessageLeft";
+    private static final String PLACED_ON_HOLD = "PlacedOnHold";
+    private static final String TOOK_OFF_HOLD = "TookOffHold";
+    private static final String PHONE_HURLED_AGAINST_WALL = "PhoneHurledAgainstWall";
 
     // Actions (Command) - name of transitions
-    public static final String CALL_DIAL = "CallDial";
-    public static final String HANG_UP = "HangUp";
-    public static final String CONNECT_CALL = "ConnectCall";
-    public static final String LEAVE_MESSAGE = "LeaveMessage";
-    public static final String PLACE_ON_HOLD = "PlaceOnHold";
-    public static final String TAKE_OFF_HOLD = "TakeOffHold";
-    public static final String HURL_PHONE = "HurlPhone";
+    private static final String CALL_DIAL = "CallDial";
+    private static final String HANG_UP = "HangUp";
+    private static final String CONNECT_CALL = "ConnectCall";
+    private static final String LEAVE_MESSAGE = "LeaveMessage";
+    private static final String PLACE_ON_HOLD = "PlaceOnHold";
+    private static final String TAKE_OFF_HOLD = "TakeOffHold";
+    private static final String HURL_PHONE = "HurlPhone";
 
     {
         SimpleState offHook = state(OFF_HOOK).build();

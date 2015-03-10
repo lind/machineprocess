@@ -25,6 +25,10 @@ public class Transition {
         return targetState;
     }
 
+    public String getName() {
+        return name;
+    }
+
     // --------------------- Builder ---------------------
     public static <T> TransitionBuilder<T> transition(T parentBuilder, String name) {
         return new TransitionBuilder<>(parentBuilder, name);
@@ -37,7 +41,7 @@ public class Transition {
      */
     public static class TransitionBuilder<T> {
         private final String name;
-        T parentBuilder;
+        final T parentBuilder;
         Predicate<Event> guard;
         private State state;
 
@@ -70,7 +74,7 @@ public class Transition {
      */
     public static class TransitionsBuilder {
 
-        List<Transition> transitions = new ArrayList<>();
+        final List<Transition> transitions = new ArrayList<>();
         Transition.TransitionBuilder<TransitionsBuilder> transitionBuilder;
 
         public Transition.TransitionBuilder<TransitionsBuilder> transition(String name) {
@@ -97,8 +101,7 @@ public class Transition {
     }
 
     public static class TransBuilder {
-        String name;
-        Transition transition;
+        final String name;
         Transition.TransitionBuilder<TransBuilder> transitionBuilder;
 
         public TransBuilder(String name) {

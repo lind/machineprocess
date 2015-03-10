@@ -126,7 +126,7 @@ public class ATMStateMachineTest {
                     .to(idle)
                     .transition(FINAL).guardedBy(e -> e.getName().equals(FinalState.FINAL_EVENT))
                     .to(idle)
-                    .initialTrasnition(singleTransition(INITIALIZE).to(authentication))
+                    .initialTransition(singleTransition(INITIALIZE).to(authentication))
                     .internalStates(Arrays.asList(authentication, selectingTransaction, transaction,
                             finalState))
                     .build();

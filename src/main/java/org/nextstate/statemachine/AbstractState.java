@@ -8,10 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractState implements State {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    protected String name;
-    protected List<Transition> transitions = new ArrayList<>();
+    protected final String name;
+    protected final List<Transition> transitions = new ArrayList<>();
 
     public AbstractState(String name) {
         this.name = name;

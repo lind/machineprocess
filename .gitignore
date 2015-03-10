@@ -4,10 +4,5 @@
 
 target
 
-# Package Files #
-*.war
-*.ear
-
 *.idea
-.iml
-
+*.iml

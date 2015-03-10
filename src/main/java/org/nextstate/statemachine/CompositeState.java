@@ -15,13 +15,13 @@ import org.slf4j.LoggerFactory;
  * is checked with a {@link org.nextstate.statemachine.FinalState#FINAL_EVENT} as a guard.
  */
 public class CompositeState extends AbstractState implements CompositeElement {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private State activeState;
-    private List<State> states = new ArrayList<>();
+    private final List<State> states = new ArrayList<>();
     private Transition initialTransition;
 
-    public CompositeState(String name) {
+    private CompositeState(String name) {
         super(name);
     }
 
@@ -41,6 +41,9 @@ public class CompositeState extends AbstractState implements CompositeElement {
     @Override public void entry() {
         log.debug("{} - entry. Setting active state: {}", name, initialTransition.getTargetState().getName());
         activeState = initialTransition.getTargetState();
+        if (activeState instanceof CompositeElement) {
+            activeState.entry();
+        }
     }
 
     @Override public Optional<State> execute(Event event) {
@@ -76,7 +79,7 @@ public class CompositeState extends AbstractState implements CompositeElement {
     }
 
     public static class CompositeStateBuilder {
-        CompositeState compositeState;
+        final CompositeState compositeState;
 
         Transition.TransitionBuilder<CompositeStateBuilder> transitionBuilder;
 
@@ -98,7 +101,7 @@ public class CompositeState extends AbstractState implements CompositeElement {
             return this;
         }
 
-        public CompositeStateBuilder initialTrasnition(Transition transition) {
+        public CompositeStateBuilder initialTransition(Transition transition) {
             compositeState.initialTransition = transition;
             return this;
         }

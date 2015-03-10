@@ -8,8 +8,8 @@ import java.util.Optional;
 import org.junit.Test;
 
 public class StateTest {
-    public static final String CALL_DIAL = "CallDial";
-    public static final String CALL_DIALED = "CallDialed";
+    private static final String CALL_DIAL = "CallDial";
+    private static final String CALL_DIALED = "CallDialed";
     private static final String FINAL = "Final";
 
     @Test

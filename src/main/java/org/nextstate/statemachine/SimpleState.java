@@ -2,11 +2,7 @@ package org.nextstate.statemachine;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class SimpleState extends AbstractState implements State {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     public SimpleState(String name) {
         super(name);
@@ -22,7 +18,7 @@ public class SimpleState extends AbstractState implements State {
     }
 
     public static class StateBuilder {
-        SimpleState state;
+        final SimpleState state;
 
         Transition.TransitionBuilder<StateBuilder> transitionBuilder;
 
