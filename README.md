@@ -1,4 +1,5 @@
 # A State Machine implementation in Java
+[![Build Status](https://travis-ci.org/lind/machineprocess.png?branch=master)](https://travis-ci.org/lind/machineprocess)
 
 Simple State Machine with transitions, guards, composite state.
 
