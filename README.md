@@ -23,17 +23,21 @@ Define the State Machine by subclassing State Machine and using the builders in 
 ### Phone State Machine Diagram
 Inspired by [simplestatemachine](http://simplestatemachine.codeplex.com/)
 
-Generated from code by [Graphviz](http://www.graphviz.org/):
+**Phone State Machine** (Generated from code by [Graphviz](http://www.graphviz.org/))
+
 ![Phone State Machine Diagram](PhoneStateMachine.bmp "Phone State Machine Diagram")
 
 ### ATM State Machine Diagram
 Inspired by [ATM Bank](http://www.uml-diagrams.org/bank-atm-uml-state-machine-diagram-example.html)
 
-Generated from code by [Graphviz](http://www.graphviz.org/):
+**ATM State Machine** (Generated from code by [Graphviz](http://www.graphviz.org/))
+
 ![ATM State Machine](ATMStateMachine.bmp)
 
-and the composite state ServingCustomer
+The composite state **ServingCustomer**
+
 ![Serving Customer](ServingCustomer.bmp)
 
-A model containing the whole state machine (not generated from code)
+**A model containing the ATM state machine and the inner states of the composite state** (not generated from code)
+
 ![ATM State Machine Diagram](ATMStateMachineDiagram.png)
