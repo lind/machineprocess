@@ -10,14 +10,9 @@ public interface State {
 
     Optional<State> execute(Event event);
 
-    /**
-     * hook for entry behavior
-     */
-    void entry();
+    void onEntry();
 
-    /**
-     * hook for exit behavior
-     */
-    void exit();
+    void onExit();
 
+    void toDot(StringBuilder sb);
 }

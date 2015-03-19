@@ -12,7 +12,9 @@ public class SimpleState extends AbstractState implements State {
         return stateTransition(event);
     }
 
-    // --------------------- Builder ---------------------
+    // =================
+    //      Builder
+    // =================
     public static StateBuilder state(String name) {
         return new StateBuilder(name);
     }
@@ -35,6 +37,16 @@ public class SimpleState extends AbstractState implements State {
             return transitionBuilder;
         }
 
+        public StateBuilder onEntry(Action action) {
+            state.entry = Optional.ofNullable(action);
+            return this;
+        }
+
+        public StateBuilder onExit(Action action) {
+            state.exit = Optional.ofNullable(action);
+            return this;
+        }
+
         public SimpleState build() {
             // Add current transition on build
             if (transitionBuilder != null) {
@@ -43,5 +55,4 @@ public class SimpleState extends AbstractState implements State {
             return state;
         }
     }
-
 }

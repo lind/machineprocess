@@ -13,7 +13,7 @@ public class StateTest {
     private static final String FINAL = "Final";
 
     @Test
-    public void transitionMatch() {
+    public void transition_match() {
         SimpleState from = new SimpleState("From");
         State to = new SimpleState("To");
         from.addTransitions(transitions()
@@ -27,7 +27,7 @@ public class StateTest {
     }
 
     @Test
-    public void transitionToFinalState() {
+    public void transition_to_final_state() {
         SimpleState from = new SimpleState("From");
         State to = new FinalState("To");
 

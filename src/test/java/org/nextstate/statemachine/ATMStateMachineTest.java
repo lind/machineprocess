@@ -49,7 +49,7 @@ public class ATMStateMachineTest {
     private static final String INITIALIZE = "Initialize";
 
     @Test
-    public void simpleStateTransfers() {
+    public void simple_state_transfers() {
         // Given
         StateMachine atm = new ATMStateMachine();
 
@@ -61,7 +61,7 @@ public class ATMStateMachineTest {
     }
 
     @Test
-    public void fromOffThroughIdleBAckToOff() {
+    public void from_off_through_idle_back_to_off() {
         StateMachine atm = new ATMStateMachine();
 
         atm.execute(new TurnedOn());
@@ -72,7 +72,7 @@ public class ATMStateMachineTest {
     }
 
     @Test
-    public void fromIdleToAuthentication() {
+    public void from_idle_to_authentication() {
         StateMachine atm = new ATMStateMachine();
         atm.activeStateConfiguration(asList(IDLE));
 
@@ -82,7 +82,7 @@ public class ATMStateMachineTest {
     }
 
     @Test
-    public void fromIdleToIdleWithATransaction() {
+    public void from_idle_to_idle_with_transaction() {
         StateMachine atm = new ATMStateMachine();
         atm.activeStateConfiguration(asList(IDLE));
 
@@ -101,6 +101,19 @@ public class ATMStateMachineTest {
         atm.execute(new Authenticated());
 
         assertThat(atm.getActiveStateConfiguration()).containsSequence(SERVING_CUSTOMER, SELECTING_TRANSACTION);
+    }
+
+    @Test
+    public void to_dot() {
+        StateMachine atm = new ATMStateMachine();
+
+        System.out.println("DOT notation for ATM:");
+        System.out.println(atm.toDot(false));
+
+        // Force the composite state to active state for producing DOT notation of the composite state
+        atm.activeStateConfiguration(Arrays.asList(SERVING_CUSTOMER, AUTHENTICATION));
+        System.out.println("DOT notation for Composite state ServingCustomer:");
+        System.out.println(((CompositeState) atm.getActiveState()).toDot(false));
     }
 
     //--------------------------------------------------

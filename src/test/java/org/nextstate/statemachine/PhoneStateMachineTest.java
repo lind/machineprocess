@@ -13,7 +13,7 @@ import org.nextstate.statemachine.PhoneStateMachine.*;
 public class PhoneStateMachineTest {
 
     @Test
-    public void oneTransition() {
+    public void one_transition() {
         // Given
         StateMachine phone = new PhoneStateMachine();
 
@@ -25,14 +25,14 @@ public class PhoneStateMachineTest {
     }
 
     @Test
-    public void noTransition() {
+    public void no_transition() {
         StateMachine phone = new PhoneStateMachine();
         phone.execute(new HungUp());
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
     }
 
     @Test
-    public void toStatePhoneDestroyed() {
+    public void to_state_phone_destroyed() {
         StateMachine phone = new PhoneStateMachine();
 
         phone.execute(new CallDialed());
@@ -54,7 +54,7 @@ public class PhoneStateMachineTest {
     }
 
     @Test
-    public void startWithRingingActiveState() {
+    public void start_with_ringing_active_state() {
         StateMachine phone = new PhoneStateMachine();
         phone.activeStateConfiguration(asList(RINGING));
 
@@ -64,7 +64,7 @@ public class PhoneStateMachineTest {
     }
 
     @Test
-    public void throughAllStatesUsingAllTransitions() {
+    public void through_all_states_using_all_transitions() {
         StateMachine phone = new PhoneStateMachine();
 
         phone.execute(new CallDialed());
@@ -95,7 +95,7 @@ public class PhoneStateMachineTest {
     }
 
     @Test
-    public void transitionsFromOnHoldState() {
+    public void transitions_from_on__hold_state() {
         StateMachine phone = new PhoneStateMachine();
         phone.activeStateConfiguration(asList(ON_HOLD));
 
@@ -106,6 +106,13 @@ public class PhoneStateMachineTest {
         phone.execute(new HungUp());
 
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
+    }
+
+    @Test
+    public void to_dot() {
+        StateMachine phone = new PhoneStateMachine();
+
+        System.out.println(phone.toDot(false));
     }
 
 }

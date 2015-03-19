@@ -25,24 +25,28 @@ public class CompositeState extends AbstractState implements CompositeElement {
         super(name);
     }
 
+    @Override public List<State> getStates() {
+        return states;
+    }
+
     @Override public State getActiveState() {
         return activeState;
     }
 
     @Override public void activeStateConfiguration(ListIterator<String> configurationIterator) {
 
-        Optional<State> state = configure(configurationIterator, states);
-        if (state.isPresent()) {
-            log.debug("activeStateConfiguration - active state: {}", state.get().getName());
-            activeState = state.get();
-        }
+        Optional<State> state = configureActiveState(configurationIterator, states);
+        state.ifPresent(s -> {
+            log.debug("activeStateConfiguration - active state: {}", s.getName());
+            activeState = s;
+        });
     }
 
-    @Override public void entry() {
-        log.debug("{} - entry. Setting active state: {}", name, initialTransition.getTargetState().getName());
+    @Override public void onEntry() {
+        log.debug("{} - onEntry. Setting active state: {}", name, initialTransition.getTargetState().getName());
         activeState = initialTransition.getTargetState();
         if (activeState instanceof CompositeElement) {
-            activeState.entry();
+            activeState.onEntry();
         }
     }
 
@@ -54,14 +58,14 @@ public class CompositeState extends AbstractState implements CompositeElement {
 
         Optional<State> state = activeState.execute(event);
 
-        // Check if new active state and execute exit on the old and entry on the new ...
+        // Check if new active state and execute exit on the old and onEntry on the new ...
         if (state.isPresent()) {
-            activeState.exit();
+            activeState.onExit();
             activeState = state.get();
-            activeState.entry();
+            activeState.onEntry();
             log.debug("execute - new active state: {}", activeState.getName());
 
-            // If next state is of type Final State then execute the transition on the Composite State with no guard.
+            // If next state is of type Final State then execute the final transition on the Composite State.
             if (activeState.transitionToFinalState()) {
                 log.debug("execute - Transition from {} to final state", activeState.getName());
 
@@ -73,7 +77,9 @@ public class CompositeState extends AbstractState implements CompositeElement {
         return stateTransition(event);
     }
 
-    // --------------------- Builder ---------------------
+    // =================
+    //      Builder
+    // =================
     public static CompositeStateBuilder compositeState(String name) {
         return new CompositeStateBuilder(name);
     }
@@ -103,6 +109,16 @@ public class CompositeState extends AbstractState implements CompositeElement {
 
         public CompositeStateBuilder initialTransition(Transition transition) {
             compositeState.initialTransition = transition;
+            return this;
+        }
+
+        public CompositeStateBuilder onEntry(Action action) {
+            compositeState.entry = Optional.ofNullable(action);
+            return this;
+        }
+
+        public CompositeStateBuilder onExit(Action action) {
+            compositeState.exit = Optional.ofNullable(action);
             return this;
         }
 

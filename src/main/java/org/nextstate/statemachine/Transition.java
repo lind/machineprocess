@@ -2,14 +2,16 @@ package org.nextstate.statemachine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Transition {
     private final String name;
     private State targetState;
-    protected Predicate<Event> guard; // getter?
+    protected Predicate<Event> guard;
+    protected Optional<Action> onTransition;
 
-    public Transition(Predicate<Event> guard, State state, String name) {
+    public Transition(Predicate<Event> guard, State state, String name, Action onTransition) {
         if (state == null) {
             throw new IllegalStateException("Missing target State!");
         }
@@ -19,6 +21,7 @@ public class Transition {
         this.guard = guard;
         this.targetState = state;
         this.name = name;
+        this.onTransition = Optional.ofNullable(onTransition);
     }
 
     public State getTargetState() {
@@ -29,7 +32,9 @@ public class Transition {
         return name;
     }
 
-    // --------------------- Builder ---------------------
+    // =================
+    //      Builder
+    // =================
     public static <T> TransitionBuilder<T> transition(T parentBuilder, String name) {
         return new TransitionBuilder<>(parentBuilder, name);
     }
@@ -44,6 +49,7 @@ public class Transition {
         final T parentBuilder;
         Predicate<Event> guard;
         private State state;
+        private Action onTransition;
 
         public TransitionBuilder(T parentBuilder, String name) {
             this.parentBuilder = parentBuilder;
@@ -55,13 +61,18 @@ public class Transition {
             return this;
         }
 
+        public TransitionBuilder<T> onTransition(Action action) {
+            this.onTransition = action;
+            return this;
+        }
+
         public T to(State state) {
             this.state = state;
             return parentBuilder;
         }
 
         public Transition build() {
-            return new Transition(guard, state, name);
+            return new Transition(guard, state, name, onTransition);
         }
     }
 

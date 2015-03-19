@@ -55,7 +55,7 @@ class PhoneStateMachine extends StateMachine {
     private static final String TOOK_OFF_HOLD = "TookOffHold";
     private static final String PHONE_HURLED_AGAINST_WALL = "PhoneHurledAgainstWall";
 
-    // Actions (Command) - name of transitions
+    // Name of transitions - (Commands resulting in triggering events)
     private static final String CALL_DIAL = "CallDial";
     private static final String HANG_UP = "HangUp";
     private static final String CONNECT_CALL = "ConnectCall";
@@ -65,7 +65,11 @@ class PhoneStateMachine extends StateMachine {
     private static final String HURL_PHONE = "HurlPhone";
 
     {
-        SimpleState offHook = state(OFF_HOOK).build();
+        Action playMuzak = () -> System.out.println("PlayMuzak");
+        Action stopMuzak = () -> System.out.println("StopMuzak");
+
+        SimpleState offHook = state(OFF_HOOK)
+                .onEntry(() -> System.out.println("In Sysout Action!")).build();
         State phoneDestroyed = state(PHONE_DESTROYED).build();
         SimpleState connected = state(CONNECTED).build();
         State onHold = state(ON_HOLD)
@@ -73,11 +77,13 @@ class PhoneStateMachine extends StateMachine {
                 .to(phoneDestroyed)
                 .transition(HANG_UP).guardedBy(event -> HUNG_UP.equals(event.getName()))
                 .to(offHook)
-                .transition(TAKE_OFF_HOLD).guardedBy(event -> TOOK_OFF_HOLD.equals(event.getName()))
+                .transition(TAKE_OFF_HOLD).onTransition(stopMuzak)
+                .guardedBy(event -> TOOK_OFF_HOLD.equals(event.getName()))
                 .to(connected)
                 .build();
         connected.addTransitions(transitions()
-                .transition(PLACE_ON_HOLD).guardedBy(event -> event.getName().equals(PLACED_ON_HOLD))
+                .transition(PLACE_ON_HOLD)
+                .onTransition(playMuzak).guardedBy(event -> event.getName().equals(PLACED_ON_HOLD))
                 .to(onHold)
                 .transition(HANG_UP).guardedBy(event -> event.getName().equals(HUNG_UP))
                 .to(offHook)

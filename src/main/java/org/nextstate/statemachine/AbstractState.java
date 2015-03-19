@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractState implements State {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    protected Optional<Action> entry = Optional.empty();
+    protected Optional<Action> exit = Optional.empty();
+
     protected final String name;
     protected final List<Transition> transitions = new ArrayList<>();
 
@@ -29,20 +32,31 @@ public abstract class AbstractState implements State {
         this.transitions.addAll(transitionList);
     }
 
+    @Override public void onEntry() {
+        entry.ifPresent(Action::perform);
+    }
+
+    @Override public void onExit() {
+        exit.ifPresent(Action::perform);
+    }
+
     public Optional<State> stateTransition(Event event) {
 
-        Optional<Transition> transition = transitions.stream().filter(t -> t.guard.test(event))
+        Optional<Transition> matchedTransition = transitions.stream().filter(t -> t.guard.test(event))
                 .findFirst();
 
-        log.debug("execute - {} event: {} ", name, event.getName(), (transition.isPresent() ?
-                " transition to state: " + transition.get().getTargetState().getName() :
+        log.debug("execute - {} event: {} ", name, event.getName(), (matchedTransition.isPresent() ?
+                " transition to state: " + matchedTransition.get().getTargetState().getName() :
                 " no transition match."));
 
-        if (!transition.isPresent()) {
+        if (!matchedTransition.isPresent()) {
             log.debug("execute - No transition match event: {} in state: {}", event.getName(), name);
             return Optional.empty();
         }
-        return Optional.ofNullable(transition.get().getTargetState());
+
+        Transition transition = matchedTransition.get();
+        transition.onTransition.ifPresent(Action::perform);
+        return Optional.ofNullable(transition.getTargetState());
     }
 
     public boolean transitionToFinalState() {
@@ -50,17 +64,23 @@ public abstract class AbstractState implements State {
                 t -> t.guard.test(new Event(FinalState.FINAL_EVENT))).findFirst();
 
         if (transition.isPresent()) {
-            if (transition.get().getTargetState() instanceof FinalState) {
-                return true;
-            }
+            return (transition.get().getTargetState() instanceof FinalState);
         }
         return false;
     }
 
-    @Override public void entry() {
-    }
+    @Override public void toDot(StringBuilder sb) {
 
-    @Override public void exit() {
+        for (Transition t : transitions) {
+            sb.append(name);
+            sb.append(" -> ");
+            sb.append(t.getTargetState().getName());
+            if (t.getName() != null) {
+                sb.append(" [label=\"");
+                sb.append(t.getName());
+                sb.append("\"];");
+            }
+            sb.append(System.lineSeparator());
+        }
     }
-
 }

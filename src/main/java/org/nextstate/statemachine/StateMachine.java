@@ -9,11 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * StateMachine
- * Subclass and use the builder in the constructor. See the unit tests for examples.
- * <p>
- * <p>
- * To state should not have the same name. If to states have the same name it is not deterministic which one is chosen when the active stave is loaded.
+ * StateMachine - Subclass and use the builder in the constructor. See the unit tests for examples.
+ * <br>
+ * To state should not have the same name. If to states have the same name it is not deterministic which one is chosen
+ * when the active stave is loaded.
  */
 public class StateMachine implements CompositeElement {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -27,11 +26,19 @@ public class StateMachine implements CompositeElement {
 
     protected void activeState(State state) {
         this.activeState = state;
-        this.activeState.entry();
+        this.activeState.onEntry();
+    }
+
+    @Override public String getName() {
+        return this.getClass().getSimpleName();
     }
 
     public String getActiveStateName() {
         return activeState.getName();
+    }
+
+    @Override public List<State> getStates() {
+        return states;
     }
 
     @Override public State getActiveState() {
@@ -64,11 +71,11 @@ public class StateMachine implements CompositeElement {
 
         ListIterator<String> configurationIterator = activeStateConfiguration.listIterator();
 
-        Optional<State> state = configure(configurationIterator, states);
-        if (state.isPresent()) {
-            log.debug("activeStateConfiguration - active state: {}", state.get().getName());
-            activeState = state.get();
-        }
+        Optional<State> state = configureActiveState(configurationIterator, states);
+        state.ifPresent(s -> {
+            log.debug("activeStateConfiguration - active state: {}", s.getName());
+            activeState = s;
+        });
     }
 
     public void execute(Event event) {
@@ -79,11 +86,11 @@ public class StateMachine implements CompositeElement {
 
         Optional<State> state = activeState.execute(event);
 
-        // Check if new active state and execute exit on the old and entry on the new ...
+        // Check if new active state and execute onExit on the old and onEntry on the new ...
         if (state.isPresent()) {
-            activeState.exit();
+            activeState.onExit();
             activeState = state.get();
-            activeState.entry();
+            activeState.onEntry();
             log.debug("execute - new active state: {}", activeState.getName());
         }
     }
