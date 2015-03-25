@@ -1,6 +1,7 @@
 # A State Machine implementation in Java
 [![Build Status](https://travis-ci.org/lind/machineprocess.png?branch=master)](https://travis-ci.org/lind/machineprocess)
 [![Dependency Status](https://www.versioneye.com/user/projects/550195a04a1064db0e000328/badge.svg?style=flat)](https://www.versioneye.com/user/projects/550195a04a1064db0e000328)
+[![Coverage Status](https://coveralls.io/repos/lind/machineprocess/badge.svg?branch=master)](https://coveralls.io/r/lind/machineprocess?branch=master)
 
 Simple State Machine with transitions, guards, composite state.
 
