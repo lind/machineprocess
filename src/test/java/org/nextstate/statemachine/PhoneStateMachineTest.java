@@ -1,6 +1,5 @@
 package org.nextstate.statemachine;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.nextstate.statemachine.PhoneStateMachine.*;
 
@@ -21,7 +20,7 @@ public class PhoneStateMachineTest {
         phone.execute(new CallDialed());
 
         // Then
-        assertThat(phone.getActiveStateName()).isEqualTo(RINGING);
+        assertThat(phone.getSimpleActiveStateConfiguration()).isEqualTo(RINGING);
     }
 
     @Test
@@ -56,7 +55,7 @@ public class PhoneStateMachineTest {
     @Test
     public void start_with_ringing_active_state() {
         StateMachine phone = new PhoneStateMachine();
-        phone.activeStateConfiguration(asList(RINGING));
+        phone.activeStateConfiguration(RINGING);
 
         phone.execute(new CallConnected());
 
@@ -97,12 +96,12 @@ public class PhoneStateMachineTest {
     @Test
     public void transitions_from_on__hold_state() {
         StateMachine phone = new PhoneStateMachine();
-        phone.activeStateConfiguration(asList(ON_HOLD));
+        phone.activeStateConfiguration(ON_HOLD);
 
         phone.execute(new TookOffHold());
         assertThat(phone.getActiveStateName()).isEqualTo(CONNECTED);
 
-        phone.activeStateConfiguration(asList(ON_HOLD));
+        phone.activeStateConfiguration(ON_HOLD);
         phone.execute(new HungUp());
 
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);

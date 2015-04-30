@@ -1,5 +1,7 @@
 package org.nextstate.statemachine;
 
+import static java.util.Arrays.asList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -51,6 +53,13 @@ public class StateMachine implements CompositeElement {
         }
     }
 
+    public String getSimpleActiveStateConfiguration() {
+        if (activeState instanceof CompositeState) {
+            log.warn("This state: " + activeState.getName() + " is a composite with a the inner active state configuration.");
+        }
+        return activeState.getName();
+    }
+
     public List<String> getActiveStateConfiguration() {
         List<String> activeStateConfiguration = new ArrayList<>();
 
@@ -64,6 +73,10 @@ public class StateMachine implements CompositeElement {
 
         log.debug("getActiveStateConfiguration - {}", activeStateConfiguration);
         return activeStateConfiguration;
+    }
+
+    public void activeStateConfiguration(String activeStateConfiguration) {
+        activeStateConfiguration(asList(activeStateConfiguration));
     }
 
     public void activeStateConfiguration(List<String> activeStateConfiguration) {

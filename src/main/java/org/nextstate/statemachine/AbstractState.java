@@ -72,9 +72,9 @@ public abstract class AbstractState implements State {
     @Override public void toDot(StringBuilder sb) {
 
         for (Transition t : transitions) {
-            sb.append(name);
+            sb.append(name.replaceAll("\\s+", "_"));
             sb.append(" -> ");
-            sb.append(t.getTargetState().getName());
+            sb.append(t.getTargetState().getName().replaceAll("\\s+", "_"));
             if (t.getName() != null) {
                 sb.append(" [label=\"");
                 sb.append(t.getName());

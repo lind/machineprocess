@@ -56,10 +56,10 @@ public interface CompositeElement {
         StringBuilder sb = new StringBuilder();
 
         sb.append("digraph ");
-        sb.append(getName());
+        sb.append(getName().replaceAll("\\s+", "_"));
         sb.append(" { ");
         sb.append(System.lineSeparator());
-        sb.append(getActiveState().getName());
+        sb.append(getActiveState().getName().replaceAll("\\s+", "_"));
         sb.append("[label=\"");
         sb.append(getActiveState().getName());
         sb.append("\"");
@@ -72,7 +72,7 @@ public interface CompositeElement {
         getActiveState().toDot(sb);
 
         getStates().stream().filter(state -> state != getActiveState()).forEach(state -> {
-            sb.append(state.getName());
+            sb.append(state.getName().replaceAll("\\s+", "_"));
             sb.append("[label=\"");
             sb.append(state.getName());
             sb.append("\"");
