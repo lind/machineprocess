@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Del
  * Composite State containing inner states.
  * <br>
  * The default transition from the Composite state after the {@link org.nextstate.statemachine.FinalState} is reached
