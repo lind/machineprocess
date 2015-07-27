@@ -8,7 +8,7 @@ public interface State {
 
     boolean transitionToFinalState();
 
-    Optional<State> execute(Event event);
+    Optional<State> execute(String event);
 
     void onEntry();
 

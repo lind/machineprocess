@@ -1,10 +1,7 @@
 package org.nextstate.statemachine;
 
-import static java.util.Arrays.asList;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -16,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * To state should not have the same name. If to states have the same name it is not deterministic which one is chosen
  * when the active stave is loaded.
  */
-public class StateMachine implements CompositeElement {
+public class StateMachine {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private State activeState;
@@ -31,7 +28,7 @@ public class StateMachine implements CompositeElement {
         this.activeState.onEntry();
     }
 
-    @Override public String getName() {
+    public String getName() {
         return this.getClass().getSimpleName();
     }
 
@@ -39,11 +36,11 @@ public class StateMachine implements CompositeElement {
         return activeState.getName();
     }
 
-    @Override public List<State> getStates() {
+    public List<State> getStates() {
         return states;
     }
 
-    @Override public State getActiveState() {
+    public State getActiveState() {
         return activeState;
     }
 
@@ -53,49 +50,25 @@ public class StateMachine implements CompositeElement {
         }
     }
 
-    public String getSimpleActiveStateConfiguration() {
-        if (activeState instanceof CompositeState) {
-            log.warn("This state: " + activeState.getName() + " is a composite with a the inner active state configuration.");
-        }
+    public String getActiveStateConfiguration() {
         return activeState.getName();
     }
 
-    public List<String> getActiveStateConfiguration() {
-        List<String> activeStateConfiguration = new ArrayList<>();
+    public void activeStateConfiguration(String stateName) {
 
-        State state = activeState;
+        Optional<State> state = states.stream().filter(s -> stateName.equals(s.getName())).findFirst();
+        state.orElseThrow(() -> new IllegalStateException("No state named " + stateName
+                + " exists. Add all states to the StateMachine before setting active state configuration."));
 
-        while (state instanceof CompositeElement) {
-            activeStateConfiguration.add(state.getName());
-            state = ((CompositeElement) state).getActiveState();
-        }
-        activeStateConfiguration.add(state.getName());
-
-        log.debug("getActiveStateConfiguration - {}", activeStateConfiguration);
-        return activeStateConfiguration;
+        activeState = state.get();
+        log.debug("activeStateConfiguration - active state: {}", activeState.getName());
     }
 
-    public void activeStateConfiguration(String activeStateConfiguration) {
-        activeStateConfiguration(asList(activeStateConfiguration));
-    }
-
-    public void activeStateConfiguration(List<String> activeStateConfiguration) {
-        log.debug("activeStateConfiguration - active states: {} ", activeStateConfiguration);
-
-        ListIterator<String> configurationIterator = activeStateConfiguration.listIterator();
-
-        Optional<State> state = configureActiveState(configurationIterator, states);
-        state.ifPresent(s -> {
-            log.debug("activeStateConfiguration - active state: {}", s.getName());
-            activeState = s;
-        });
-    }
-
-    public void execute(Event event) {
+    public void execute(String event) {
         if (activeState == null) {
             throw new IllegalStateException("No active state");
         }
-        log.debug("execute - activeState: " + activeState.getName() + " event: " + event.getClass().getSimpleName());
+        log.debug("execute - activeState: " + activeState.getName() + " event: " + event);
 
         Optional<State> state = activeState.execute(event);
 
@@ -107,4 +80,47 @@ public class StateMachine implements CompositeElement {
             log.debug("execute - new active state: {}", activeState.getName());
         }
     }
+
+    /**
+     * DOT graph description language for the State Machine.
+     * Composite states is filled with grey but internal states is not included. Should be possible at least for one
+     * level with DOT attrs compound:
+     * See: http://www.graphviz.org/content/attrs#dcompound and
+     * http://stackoverflow.com/questions/2012036/graphviz-how-to-connect-subgraphs
+     *
+     * @return sting describing the state machine graph
+     */
+    public String toDot(boolean showActiveState) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("digraph ");
+        sb.append(getName().replaceAll("\\s+", "_"));
+        sb.append(" { ");
+        sb.append(System.lineSeparator());
+        sb.append(getActiveState().getName().replaceAll("\\s+", "_"));
+        sb.append("[label=\"");
+        sb.append(getActiveState().getName());
+        sb.append("\"");
+        if (showActiveState) {
+            sb.append(", style=filled, fillcolor=lightblue");
+        }
+        sb.append("];");
+        sb.append(System.lineSeparator());
+
+        getActiveState().toDot(sb);
+
+        getStates().stream().filter(state -> state != getActiveState()).forEach(state -> {
+            sb.append(state.getName().replaceAll("\\s+", "_"));
+            sb.append("[label=\"");
+            sb.append(state.getName());
+            sb.append("\"");
+            sb.append("];");
+            sb.append(System.lineSeparator());
+            state.toDot(sb);
+        });
+        sb.append("} ");
+        sb.append(System.lineSeparator());
+        return sb.toString();
+    }
+
 }

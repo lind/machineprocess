@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.nextstate.statemachine.PhoneStateMachine.*;
 
 import org.junit.Test;
-import org.nextstate.statemachine.PhoneStateMachine.*;
 
 /**
  * Tests using the state machine defined in {@link org.nextstate.statemachine.PhoneStateMachine}
@@ -17,16 +16,16 @@ public class PhoneStateMachineTest {
         StateMachine phone = new PhoneStateMachine();
 
         // When
-        phone.execute(new CallDialed());
+        phone.execute(PhoneStateMachine.CALL_DIALED);
 
         // Then
-        assertThat(phone.getSimpleActiveStateConfiguration()).isEqualTo(RINGING);
+        assertThat(phone.getActiveStateConfiguration()).isEqualTo(RINGING);
     }
 
     @Test
     public void no_transition() {
         StateMachine phone = new PhoneStateMachine();
-        phone.execute(new HungUp());
+        phone.execute(PhoneStateMachine.HUNG_UP);
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
     }
 
@@ -34,10 +33,10 @@ public class PhoneStateMachineTest {
     public void to_state_phone_destroyed() {
         StateMachine phone = new PhoneStateMachine();
 
-        phone.execute(new CallDialed());
-        phone.execute(new CallConnected());
-        phone.execute(new PlacedOnHold());
-        phone.execute(new PhoneHurledAgainstWall());
+        phone.execute(PhoneStateMachine.CALL_DIALED);
+        phone.execute(PhoneStateMachine.CALL_CONNECTED);
+        phone.execute(PhoneStateMachine.PLACED_ON_HOLD);
+        phone.execute(PhoneStateMachine.PHONE_HURLED_AGAINST_WALL);
 
         assertThat(phone.getActiveStateName()).isEqualTo(PHONE_DESTROYED);
     }
@@ -46,8 +45,8 @@ public class PhoneStateMachineTest {
     public void transition_to_same_state() {
         StateMachine phone = new PhoneStateMachine();
 
-        phone.execute(new CallDialed());
-        phone.execute(new HungUp());
+        phone.execute(PhoneStateMachine.CALL_DIALED);
+        phone.execute(PhoneStateMachine.HUNG_UP);
 
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
     }
@@ -57,7 +56,7 @@ public class PhoneStateMachineTest {
         StateMachine phone = new PhoneStateMachine();
         phone.activeStateConfiguration(RINGING);
 
-        phone.execute(new CallConnected());
+        phone.execute(PhoneStateMachine.CALL_CONNECTED);
 
         assertThat(phone.getActiveStateName()).isEqualTo(CONNECTED);
     }
@@ -66,29 +65,29 @@ public class PhoneStateMachineTest {
     public void through_all_states_using_all_transitions() {
         StateMachine phone = new PhoneStateMachine();
 
-        phone.execute(new CallDialed());
-        phone.execute(new HungUp());
+        phone.execute(PhoneStateMachine.CALL_DIALED);
+        phone.execute(PhoneStateMachine.HUNG_UP);
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
 
-        phone.execute(new CallDialed());
-        phone.execute(new CallConnected());
-        phone.execute(new HungUp());
+        phone.execute(PhoneStateMachine.CALL_DIALED);
+        phone.execute(PhoneStateMachine.CALL_CONNECTED);
+        phone.execute(PhoneStateMachine.HUNG_UP);
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
 
-        phone.execute(new CallDialed());
-        phone.execute(new CallConnected());
-        phone.execute(new MessageLeft());
+        phone.execute(PhoneStateMachine.CALL_DIALED);
+        phone.execute(PhoneStateMachine.CALL_CONNECTED);
+        phone.execute(PhoneStateMachine.MESSAGE_LEFT);
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
 
-        phone.execute(new CallDialed());
-        phone.execute(new CallConnected());
-        phone.execute(new HungUp());
+        phone.execute(PhoneStateMachine.CALL_DIALED);
+        phone.execute(PhoneStateMachine.CALL_CONNECTED);
+        phone.execute(PhoneStateMachine.HUNG_UP);
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
 
-        phone.execute(new CallDialed());
-        phone.execute(new CallConnected());
-        phone.execute(new PlacedOnHold());
-        phone.execute(new PhoneHurledAgainstWall());
+        phone.execute(PhoneStateMachine.CALL_DIALED);
+        phone.execute(PhoneStateMachine.CALL_CONNECTED);
+        phone.execute(PhoneStateMachine.PLACED_ON_HOLD);
+        phone.execute(PhoneStateMachine.PHONE_HURLED_AGAINST_WALL);
 
         assertThat(phone.getActiveStateName()).isEqualTo(PHONE_DESTROYED);
     }
@@ -98,11 +97,11 @@ public class PhoneStateMachineTest {
         StateMachine phone = new PhoneStateMachine();
         phone.activeStateConfiguration(ON_HOLD);
 
-        phone.execute(new TookOffHold());
+        phone.execute(PhoneStateMachine.TOOK_OFF_HOLD);
         assertThat(phone.getActiveStateName()).isEqualTo(CONNECTED);
 
         phone.activeStateConfiguration(ON_HOLD);
-        phone.execute(new HungUp());
+        phone.execute(PhoneStateMachine.HUNG_UP);
 
         assertThat(phone.getActiveStateName()).isEqualTo(OFF_HOOK);
     }

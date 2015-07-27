@@ -17,10 +17,10 @@ public class StateTest {
         SimpleState from = new SimpleState("From");
         State to = new SimpleState("To");
         from.addTransitions(transitions()
-                .transition(CALL_DIAL).guardedBy(event -> CALL_DIALED.equals(event.getName()))
+                .transition(CALL_DIAL).guardedBy(CALL_DIALED)
                 .to(to).build());
 
-        Optional<State> target = from.execute(new CallDialed());
+        Optional<State> target = from.execute(CALL_DIALED);
 
         assertThat(target.isPresent());
         assertThat(target.get().getName()).isEqualTo("To");
@@ -32,17 +32,11 @@ public class StateTest {
         State to = new FinalState("To");
 
         from.addTransitions(transitions()
-                .transition(FINAL).guardedBy(e -> e.getName().equals(FinalState.FINAL_EVENT))
+                .transition(FINAL).guardedBy(FinalState.FINAL_EVENT)
                 .to(to)
                 .build());
 
         assertThat(from.transitionToFinalState()).isTrue();
-    }
-
-    public static class CallDialed extends Event {
-        public CallDialed() {
-            super(CALL_DIALED);
-        }
     }
 
 }

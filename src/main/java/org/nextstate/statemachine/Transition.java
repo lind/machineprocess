@@ -3,22 +3,21 @@ package org.nextstate.statemachine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 public class Transition {
     private final String name;
     private State targetState;
-    protected Predicate<Event> guard;
+    protected String guardEvent;
     protected Optional<Action> onTransition;
 
-    public Transition(Predicate<Event> guard, State state, String name, Action onTransition) {
+    public Transition(String guardEvent, State state, String name, Action onTransition) {
         if (state == null) {
             throw new IllegalStateException("Missing target State!");
         }
-        if (guard == null) {
+        if (guardEvent == null) {
             throw new IllegalStateException("Transitions must have guards!");
         }
-        this.guard = guard;
+        this.guardEvent = guardEvent;
         this.targetState = state;
         this.name = name;
         this.onTransition = Optional.ofNullable(onTransition);
@@ -47,7 +46,7 @@ public class Transition {
     public static class TransitionBuilder<T> {
         private final String name;
         final T parentBuilder;
-        Predicate<Event> guard;
+        String guardEvent;
         private State state;
         private Action onTransition;
 
@@ -56,8 +55,8 @@ public class Transition {
             this.name = name;
         }
 
-        public TransitionBuilder<T> guardedBy(Predicate<Event> guard) {
-            this.guard = guard;
+        public TransitionBuilder<T> guardedBy(String guardEvent) {
+            this.guardEvent = guardEvent;
             return this;
         }
 
@@ -72,7 +71,7 @@ public class Transition {
         }
 
         public Transition build() {
-            return new Transition(guard, state, name, onTransition);
+            return new Transition(guardEvent, state, name, onTransition);
         }
     }
 
@@ -123,7 +122,7 @@ public class Transition {
             //            return
             transitionBuilder = Transition.transition(this, name);
             transitionBuilder.to(state);
-            transitionBuilder.guardedBy(e -> true);
+            transitionBuilder.guardedBy(null);
             return transitionBuilder.build();
         }
     }

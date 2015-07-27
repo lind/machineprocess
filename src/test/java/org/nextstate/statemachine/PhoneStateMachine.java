@@ -47,13 +47,13 @@ class PhoneStateMachine extends StateMachine {
     public static final String PHONE_DESTROYED = "PhoneDestroyed";
 
     // Event names
-    private static final String CALL_DIALED = "CallDialed";
-    private static final String HUNG_UP = "HungUp";
-    private static final String CALL_CONNECTED = "CallConnected";
-    private static final String MESSAGE_LEFT = "MessageLeft";
-    private static final String PLACED_ON_HOLD = "PlacedOnHold";
-    private static final String TOOK_OFF_HOLD = "TookOffHold";
-    private static final String PHONE_HURLED_AGAINST_WALL = "PhoneHurledAgainstWall";
+    public static final String CALL_DIALED = "CallDialed";
+    public static final String HUNG_UP = "HungUp";
+    public static final String CALL_CONNECTED = "CallConnected";
+    public static final String MESSAGE_LEFT = "MessageLeft";
+    public static final String PLACED_ON_HOLD = "PlacedOnHold";
+    public static final String TOOK_OFF_HOLD = "TookOffHold";
+    public static final String PHONE_HURLED_AGAINST_WALL = "PhoneHurledAgainstWall";
 
     // Name of transitions - (Commands resulting in triggering events)
     private static final String CALL_DIAL = "CallDial";
@@ -73,76 +73,34 @@ class PhoneStateMachine extends StateMachine {
         State phoneDestroyed = state(PHONE_DESTROYED).build();
         SimpleState connected = state(CONNECTED).build();
         State onHold = state(ON_HOLD)
-                .transition(HURL_PHONE).guardedBy(event -> PHONE_HURLED_AGAINST_WALL.equals(event.getName()))
+                .transition(HURL_PHONE).guardedBy(PHONE_HURLED_AGAINST_WALL)
                 .to(phoneDestroyed)
-                .transition(HANG_UP).guardedBy(event -> HUNG_UP.equals(event.getName()))
+                .transition(HANG_UP).guardedBy(HUNG_UP)
                 .to(offHook)
                 .transition(TAKE_OFF_HOLD).onTransition(stopMuzak)
-                .guardedBy(event -> TOOK_OFF_HOLD.equals(event.getName()))
+                .guardedBy(TOOK_OFF_HOLD)
                 .to(connected)
                 .build();
         connected.addTransitions(transitions()
                 .transition(PLACE_ON_HOLD)
-                .onTransition(playMuzak).guardedBy(event -> event.getName().equals(PLACED_ON_HOLD))
+                .onTransition(playMuzak).guardedBy(PLACED_ON_HOLD)
                 .to(onHold)
-                .transition(HANG_UP).guardedBy(event -> event.getName().equals(HUNG_UP))
+                .transition(HANG_UP).guardedBy(HUNG_UP)
                 .to(offHook)
-                .transition(LEAVE_MESSAGE).guardedBy(event -> event.getName().equals(MESSAGE_LEFT))
+                .transition(LEAVE_MESSAGE).guardedBy(MESSAGE_LEFT)
                 .to(offHook)
                 .build());
         State ringing = state(RINGING)
-                .transition(CONNECT_CALL).guardedBy(event -> event.getName().equals(CALL_CONNECTED))
+                .transition(CONNECT_CALL).guardedBy(CALL_CONNECTED)
                 .to(connected)
-                .transition(HANG_UP).guardedBy(event -> event.getName().equals(HUNG_UP))
+                .transition(HANG_UP).guardedBy(HUNG_UP)
                 .to(offHook)
                 .build();
         offHook.addTransitions(transitions()
-                .transition(CALL_DIAL).guardedBy(event -> event.getName().equals(CALL_DIALED))
+                .transition(CALL_DIAL).guardedBy(CALL_DIALED)
                 .to(ringing).build());
         addStates(Arrays.asList(offHook, phoneDestroyed, onHold, connected, ringing));
         activeState(offHook);
         validate();
-    }
-
-    public static class CallDialed extends Event {
-        public CallDialed() {
-            super(CALL_DIALED);
-        }
-    }
-
-    public static class HungUp extends Event {
-        public HungUp() {
-            super(HUNG_UP);
-        }
-    }
-
-    public static class CallConnected extends Event {
-        public CallConnected() {
-            super(CALL_CONNECTED);
-        }
-    }
-
-    public static class MessageLeft extends Event {
-        public MessageLeft() {
-            super(MESSAGE_LEFT);
-        }
-    }
-
-    public static class PlacedOnHold extends Event {
-        public PlacedOnHold() {
-            super(PLACED_ON_HOLD);
-        }
-    }
-
-    public static class TookOffHold extends Event {
-        public TookOffHold() {
-            super(TOOK_OFF_HOLD);
-        }
-    }
-
-    public static class PhoneHurledAgainstWall extends Event {
-        public PhoneHurledAgainstWall() {
-            super(PHONE_HURLED_AGAINST_WALL);
-        }
     }
 }
