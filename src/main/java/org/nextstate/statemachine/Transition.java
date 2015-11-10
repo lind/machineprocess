@@ -2,13 +2,12 @@ package org.nextstate.statemachine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class Transition {
     private final String name;
     private State targetState;
     protected String guardEvent;
-    protected Optional<Action> onTransition;
+    protected Action onTransition;
 
     public Transition(String guardEvent, State state, String name, Action onTransition) {
         if (state == null) {
@@ -20,7 +19,7 @@ public class Transition {
         this.guardEvent = guardEvent;
         this.targetState = state;
         this.name = name;
-        this.onTransition = Optional.ofNullable(onTransition);
+        this.onTransition = onTransition;
     }
 
     public State getTargetState() {

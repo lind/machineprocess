@@ -64,12 +64,23 @@ class PhoneStateMachine extends StateMachine {
     private static final String TAKE_OFF_HOLD = "TakeOffHold";
     private static final String HURL_PHONE = "HurlPhone";
 
-    {
-        Action playMuzak = () -> System.out.println("PlayMuzak");
-        Action stopMuzak = () -> System.out.println("StopMuzak");
+    Action playMuzak = new Action() {
+        @Override public void perform() {
+            System.out.println("PlayMuzak");
+        }
+    };
+    Action stopMuzak = new Action() {
+        @Override public void perform() {
+            System.out.println("StopMuzak");
+        }
+    };
 
+    {
         SimpleState offHook = state(OFF_HOOK)
-                .onEntry(() -> System.out.println("In Sysout Action!")).build();
+                .onEntry(new Action() {
+                    @Override public void perform() {
+                        System.out.println("In Sysout Action!");
+                    }}).build();
         State phoneDestroyed = state(PHONE_DESTROYED).build();
         SimpleState connected = state(CONNECTED).build();
         State onHold = state(ON_HOLD)
@@ -77,28 +88,20 @@ class PhoneStateMachine extends StateMachine {
                 .to(phoneDestroyed)
                 .transition(HANG_UP).guardedBy(HUNG_UP)
                 .to(offHook)
-                .transition(TAKE_OFF_HOLD).onTransition(stopMuzak)
-                .guardedBy(TOOK_OFF_HOLD)
+                .transition(TAKE_OFF_HOLD).onTransition(stopMuzak).guardedBy(TOOK_OFF_HOLD)
                 .to(connected)
                 .build();
         connected.addTransitions(transitions()
-                .transition(PLACE_ON_HOLD)
-                .onTransition(playMuzak).guardedBy(PLACED_ON_HOLD)
-                .to(onHold)
-                .transition(HANG_UP).guardedBy(HUNG_UP)
-                .to(offHook)
-                .transition(LEAVE_MESSAGE).guardedBy(MESSAGE_LEFT)
-                .to(offHook)
+                .transition(PLACE_ON_HOLD).onTransition(playMuzak).guardedBy(PLACED_ON_HOLD).to(onHold)
+                .transition(HANG_UP).guardedBy(HUNG_UP).to(offHook)
+                .transition(LEAVE_MESSAGE).guardedBy(MESSAGE_LEFT).to(offHook)
                 .build());
         State ringing = state(RINGING)
-                .transition(CONNECT_CALL).guardedBy(CALL_CONNECTED)
-                .to(connected)
-                .transition(HANG_UP).guardedBy(HUNG_UP)
-                .to(offHook)
+                .transition(CONNECT_CALL).guardedBy(CALL_CONNECTED).to(connected)
+                .transition(HANG_UP).guardedBy(HUNG_UP).to(offHook)
                 .build();
         offHook.addTransitions(transitions()
-                .transition(CALL_DIAL).guardedBy(CALL_DIALED)
-                .to(ringing).build());
+                .transition(CALL_DIAL).guardedBy(CALL_DIALED).to(ringing).build());
         addStates(Arrays.asList(offHook, phoneDestroyed, onHold, connected, ringing));
         activeState(offHook);
         validate();

@@ -15,6 +15,7 @@ public class PhoneStateMachineTest {
         // Given
         StateMachine phone = new PhoneStateMachine();
 
+        System.out.println(phone.toDot(false));
         // When
         phone.execute(PhoneStateMachine.CALL_DIALED);
 

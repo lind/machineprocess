@@ -2,7 +2,6 @@ package org.nextstate.statemachine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +9,8 @@ import org.slf4j.LoggerFactory;
 public class SimpleState implements State {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    protected Optional<Action> entry = Optional.empty();
-    protected Optional<Action> exit = Optional.empty();
+    protected Action entry = null;
+    protected Action exit = null;
 
     protected final String name;
     protected final List<Transition> transitions = new ArrayList<>();
@@ -33,42 +32,51 @@ public class SimpleState implements State {
     }
 
     @Override public void onEntry() {
-        entry.ifPresent(Action::perform);
+        if (entry != null) {
+            entry.perform();
+        }
     }
 
     @Override public void onExit() {
-        exit.ifPresent(Action::perform);
+        if (exit != null) {
+            exit.perform();
+        }
     }
 
-    @Override public Optional<State> execute(String event) {
+    @Override public State execute(String event) {
         return stateTransition(event);
     }
 
-    public Optional<State> stateTransition(String event) {
+    public State stateTransition(String event) {
 
-        Optional<Transition> matchedTransition = transitions.stream()
-                .filter(t -> t.guardEvent == null || t.guardEvent.equals(event))
-                .findFirst();
-
-        log.debug("execute - {} event: {} ", name, event, (matchedTransition.isPresent() ?
-                " transition to state: " + matchedTransition.get().getTargetState().getName() :
-                " no transition match."));
-
-        if (!matchedTransition.isPresent()) {
-            log.debug("execute - No transition match event: {} in state: {}", event, name);
-            return Optional.empty();
+        Transition matchedTransition = null;
+        for (Transition t : transitions) {
+            if (t.guardEvent == null || t.guardEvent.equals(event)) {
+                matchedTransition = t;
+            }
         }
 
-        Transition transition = matchedTransition.get();
-        transition.onTransition.ifPresent(Action::perform);
-        return Optional.ofNullable(transition.getTargetState());
+        log.debug("stateTransition state:{} - event:{} {}", name, event, (matchedTransition != null ?
+                " transition to state: " + matchedTransition.getTargetState().getName() :
+                " no transition match."));
+
+        if (matchedTransition != null) {
+            if (matchedTransition.onTransition != null) {
+                log.debug("stateTransition - Transition match event: {} in state: {}", event, name);
+                matchedTransition.onTransition.perform();
+            }
+            return matchedTransition.getTargetState();
+        }
+        return null;
     }
 
     public boolean transitionToFinalState() {
-        Optional<Transition> transition = transitions.stream().filter(
-                t -> t.guardEvent.equals(FinalState.FINAL_EVENT)).findFirst();
-
-        return transition.isPresent() && (transition.get().getTargetState() instanceof FinalState);
+        for (Transition t : transitions) {
+            if (t.guardEvent.equals(FinalState.FINAL_EVENT)) {
+                return t.getTargetState() instanceof FinalState;
+            }
+        }
+        return false;
     }
 
     @Override public void toDot(StringBuilder sb) {
@@ -112,12 +120,12 @@ public class SimpleState implements State {
         }
 
         public StateBuilder onEntry(Action action) {
-            state.entry = Optional.ofNullable(action);
+            state.entry = action;
             return this;
         }
 
         public StateBuilder onExit(Action action) {
-            state.exit = Optional.ofNullable(action);
+            state.exit = action;
             return this;
         }
 

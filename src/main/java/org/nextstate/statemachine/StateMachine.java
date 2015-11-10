@@ -2,7 +2,6 @@ package org.nextstate.statemachine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +55,15 @@ public class StateMachine {
 
     public void activeStateConfiguration(String stateName) {
 
-        Optional<State> state = states.stream().filter(s -> stateName.equals(s.getName())).findFirst();
-        state.orElseThrow(() -> new IllegalStateException("No state named " + stateName
-                + " exists. Add all states to the StateMachine before setting active state configuration."));
-
-        activeState = state.get();
-        log.debug("activeStateConfiguration - active state: {}", activeState.getName());
+        for (State state : states) {
+            if (state.getName().equals(stateName)) {
+                activeState = state;
+                log.debug("activeStateConfiguration - active state: {}", activeState.getName());
+                return;
+            }
+        }
+        throw new IllegalStateException("No state named " + stateName
+                + " exists. Add all states to the StateMachine before setting active state configuration.");
     }
 
     public void execute(String event) {
@@ -70,12 +72,12 @@ public class StateMachine {
         }
         log.debug("execute - activeState: " + activeState.getName() + " event: " + event);
 
-        Optional<State> state = activeState.execute(event);
+        State state = activeState.execute(event);
 
         // Check if new active state and execute onExit on the old and onEntry on the new ...
-        if (state.isPresent()) {
+        if (state != null) {
             activeState.onExit();
-            activeState = state.get();
+            activeState = state;
             activeState.onEntry();
             log.debug("execute - new active state: {}", activeState.getName());
         }
@@ -109,7 +111,8 @@ public class StateMachine {
 
         getActiveState().toDot(sb);
 
-        getStates().stream().filter(state -> state != getActiveState()).forEach(state -> {
+        for (State state :states){
+            if (state != activeState) {
             sb.append(state.getName().replaceAll("\\s+", "_"));
             sb.append("[label=\"");
             sb.append(state.getName());
@@ -117,7 +120,8 @@ public class StateMachine {
             sb.append("];");
             sb.append(System.lineSeparator());
             state.toDot(sb);
-        });
+            }
+        }
         sb.append("} ");
         sb.append(System.lineSeparator());
         return sb.toString();

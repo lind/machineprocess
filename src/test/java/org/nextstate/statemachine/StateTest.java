@@ -3,8 +3,6 @@ package org.nextstate.statemachine;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.nextstate.statemachine.Transition.transitions;
 
-import java.util.Optional;
-
 import org.junit.Test;
 
 public class StateTest {
@@ -20,10 +18,10 @@ public class StateTest {
                 .transition(CALL_DIAL).guardedBy(CALL_DIALED)
                 .to(to).build());
 
-        Optional<State> target = from.execute(CALL_DIALED);
+        State target = from.execute(CALL_DIALED);
 
-        assertThat(target.isPresent());
-        assertThat(target.get().getName()).isEqualTo("To");
+        assertThat(target).isNotNull();
+        assertThat(target.getName()).isEqualTo("To");
     }
 
     @Test
